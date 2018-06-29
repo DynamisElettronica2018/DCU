@@ -77,6 +77,8 @@
 
 /* LwIP Stack Parameters (modified compared to initialization value in opt.h) -*/
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
+/*----- Default Value for MEMP_NUM_UDP_PCB: 4 ---*/
+#define MEMP_NUM_UDP_PCB 5
 /*----- Default Value for LWIP_TCP: 1 ---*/
 #define LWIP_TCP 0
 /*----- Default Value for MEMP_NUM_TCP_PCB: 5 ---*/

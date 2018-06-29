@@ -1,0 +1,181 @@
+#include "bno055.h"
+#include "i2c.h"
+#include "data.h"
+
+
+BNO055_Imu_Raw_Data_t raw_Data;
+BNO055_Imu_Converted_Data_t converted_Data;
+uint8_t imu_Acc_Raw_Data[6];
+uint8_t imu_Gyr_Heading_Raw_Data[8];
+volatile uint8_t BNO055_State = BNO055_INIT;
+volatile uint8_t BNO055_Imu_I2C_Readed = 0;
+volatile uint8_t BNO055_Imu_I2C_Transmitted = 0;
+static uint32_t BNO055_Time_Elapsed = 0;
+static uint32_t BNO055_Time_Current = 0;
+
+
+extern void BNO055_Init(void)
+{
+  BNO055_Write_Register(SYS_TRIGGER_REGISTER, 128);
+  BNO055_Change_Mode(NDOF);
+  
+  for(uint8_t i = 0; i < 6; i++)
+  {
+    imu_Acc_Raw_Data[i] = 0;
+  }
+  
+  for(uint8_t i = 0; i < 8; i++)
+  {
+    imu_Gyr_Heading_Raw_Data[i] = 0;
+  }
+  
+  BNO055_State = BNO055_ACC_READ_STATE_TX;
+}
+
+
+extern inline void BNO055_Imu_State_Machine(void)
+{
+  uint8_t reg;
+  
+  switch(BNO055_State)
+  {
+    case BNO055_INIT:
+      BNO055_Init();
+      BNO055_State = BNO055_ACC_READ_STATE_TX;
+      break;
+    
+    case BNO055_ACC_READ_STATE_TX:
+      if(HAL_I2C_GetState(&hi2c4) == HAL_I2C_STATE_READY)
+      {
+        reg = ACCX_DATA_REGISTER;
+        HAL_I2C_Master_Transmit(&hi2c4, (uint16_t)(BNO055_ADDRESS_COM3_HIGH << 1), &reg, 1, 100);
+        BNO055_State = BNO055_ACC_READ_STATE_RX;
+      }
+      
+      break;
+    
+    case BNO055_ACC_READ_STATE_RX:
+      if(HAL_I2C_GetState(&hi2c4) == HAL_I2C_STATE_READY)
+      {
+        HAL_I2C_Master_Receive(&hi2c4, (uint16_t)(BNO055_ADDRESS_COM3_HIGH << 1), imu_Acc_Raw_Data, 6, 100);
+        BNO055_State = BNO055_GYR_READ_STATE_TX;
+      }
+      
+      break;
+
+    case BNO055_GYR_READ_STATE_TX:
+      if(HAL_I2C_GetState(&hi2c4) == HAL_I2C_STATE_READY)
+      {
+        reg = GYROX_DATA_REGISTER;
+        HAL_I2C_Master_Transmit(&hi2c4, (uint16_t)(BNO055_ADDRESS_COM3_HIGH << 1), &reg, 1, 100);
+        BNO055_State = BNO055_GYR_READ_STATE_RX;
+        break;
+      }
+    
+    case BNO055_GYR_READ_STATE_RX:
+      if(HAL_I2C_GetState(&hi2c4) == HAL_I2C_STATE_READY)
+      {
+        HAL_I2C_Master_Receive(&hi2c4, (uint16_t)(BNO055_ADDRESS_COM3_HIGH << 1), imu_Gyr_Heading_Raw_Data, 8, 1000);
+        BNO055_State = BNO055_DATA_TO_BUFFER_STATE;
+        BNO055_Time_Elapsed = HAL_GetTick();
+      }
+      
+      break;
+    
+    case BNO055_DATA_TO_BUFFER_STATE:
+      Imu_Dcu_Conversion_To_Buffer();
+      BNO055_State = BNO055_IDLE;
+      break;
+      
+    case BNO055_IDLE:
+      BNO055_Time_Current = HAL_GetTick();
+      
+      if((BNO055_Time_Current - BNO055_Time_Elapsed) >= 1000)
+      {
+        HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+        BNO055_State = BNO055_ACC_READ_STATE_TX;
+      }
+      
+      break;
+  }
+}
+
+
+extern inline BNO055_Imu_Raw_Data_t BNO055_Imu_Read_Data(void)
+{ 
+	for(uint8_t i = 0; i < 3; i++)
+	{
+		raw_Data.accelerometer[i] = BNO055_Read_Data(ACCX_DATA_REGISTER + (2 * i));
+		raw_Data.gyroscope[i] = BNO055_Read_Data(GYROX_DATA_REGISTER + (2 * i));
+	}
+
+	raw_Data.heading = BNO055_Read_Data(EUL_HEADING_DATA_REGISTER);
+  return raw_Data;
+}
+
+
+extern inline BNO055_Imu_Converted_Data_t BNO055_Imu_Convert_Data(void)
+{
+  raw_Data = BNO055_Imu_Read_Data();
+  
+  for(uint8_t i = 0; i < 3; i++)
+	{
+		converted_Data.accelerometer[i] = (float)raw_Data.accelerometer[i] / (float)100;
+		converted_Data.gyroscope[i] = (float)raw_Data.gyroscope[i] / (float)16;
+	}
+  
+  converted_Data.heading = (float)raw_Data.heading / (float)16;
+  return converted_Data;
+}
+
+
+static inline void BNO055_Change_Mode(const uint8_t mode)
+{
+	BNO055_Write_Register(OPR_MODE_REGISTER, mode);
+ 	
+ 	switch(mode)
+ 	{
+    case CONFIG_MODE:
+      HAL_Delay(10);
+      break;
+
+    default:
+      HAL_Delay(25);
+      break;
+ 	}
+}
+
+
+static inline uint16_t BNO055_Read_Data(uint8_t reg)
+{
+	uint8_t buffer[2];
+	uint16_t data = 0;
+
+	HAL_I2C_Master_Transmit(&hi2c4, (uint16_t)(BNO055_ADDRESS_COM3_HIGH << 1), &reg, 1, 1000);
+	HAL_I2C_Master_Receive(&hi2c4, (uint16_t)(BNO055_ADDRESS_COM3_HIGH << 1), buffer, 2, 1000);
+	data = (((uint16_t)buffer[1] << 8) & 0xFF00) | ((uint16_t)buffer[0] & 0x00FF);
+	return data;
+}
+
+
+static inline void BNO055_Write_Register(const uint8_t reg, const uint8_t value)
+{
+	uint8_t buffer[2];
+  HAL_StatusTypeDef err;
+
+	buffer[0] = reg;
+	buffer[1] = value;
+	err = HAL_I2C_Master_Transmit(&hi2c4, (uint16_t)(BNO055_ADDRESS_COM3_HIGH << 1), buffer, 2, 1000);
+  
+  if(err != HAL_OK)
+  {
+    HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+    
+    while(1)
+    {
+      HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+      HAL_Delay(100);
+    }
+  }
+}

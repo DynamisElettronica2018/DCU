@@ -70,6 +70,10 @@
 #endif /* WITH_RTOS */
 
 /* USER CODE BEGIN 0 */
+   
+extern uint8_t IP_ADDRESS[4];
+extern uint8_t NETMASK_ADDRESS[4];
+extern uint8_t GATEWAY_ADDRESS[4];
 
 /* USER CODE END 0 */
 

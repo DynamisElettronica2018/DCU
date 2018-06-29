@@ -1,0 +1,861 @@
+#include <stdio.h>
+#include "data.h"
+#include "bno055.h"
+#include "string_utility.h"
+#include "user_defines.h"
+#include "can_id_Defines.h"
+#include "telemetry_command.h"
+
+
+uint8_t dcu_State_Packet[BUFFER_STATE_LEN];
+uint8_t dcu_Debug_Packet[BUFFER_DEBUG_LEN];
+uint8_t *buffer_Block_Write = NULL;
+uint8_t *buffer_Block = NULL;
+volatile uint32_t USB_Timestamp = 0;
+volatile uint8_t start_Acquisition_Request = 0;
+
+static uint8_t buffer_Block_1[BUFFER_BLOCK_LEN];
+static uint8_t buffer_Block_2[BUFFER_BLOCK_LEN];
+static float fTemp = 0.0;
+static int16_t iTemp = 0;
+static uint16_t uTemp = 0;
+static uint16_t data0 = 0;
+static uint16_t data1 = 0;
+static uint16_t data2 = 0;
+static uint16_t data3 = 0;
+static uint16_t data4 = 0;
+static uint16_t data5 = 0;
+static uint16_t data6 = 0;
+static uint16_t data7 = 0;
+
+
+// Funzione che inserisce i separatori di canali nel buffer.
+// Da chiamare una sola volta prima del while, per inizializzare una riga del file CSV.
+extern void initialize_Data(void)
+{
+  buffer_Block = buffer_Block_1;
+	buffer_Block_Write = buffer_Block_2;
+
+  for(uint16_t i = 0; i < BUFFER_BLOCK_LEN; i++)
+  {
+    buffer_Block_1[i] = '0';
+    buffer_Block_2[i] = '0';
+  }
+  
+  for(uint16_t i = 0; i < BUFFER_DEBUG_LEN ; i++)
+  {
+    dcu_Debug_Packet[i] = '0';
+  }
+  
+  // Set all separators between channels for buffer_Block_1.
+  // Set all separators between channels for buffer_Block_1.
+  buffer_Block_1[SEP_EFI_START] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_HALL_12] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_HALL_23] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_HALL_34] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_HALL_H20] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_H20_12] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_H20_23] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_H20_34] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_H20_OIL] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_OIL_12] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_OIL_23] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_OIL_34] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_OIL_GEAR] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_GEAR_12] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_GEAR_23] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_GEAR_34] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_GEAR_TRACTION] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_TRACTION_12] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_TRACTION_23] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_TRACTION_34] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_TRACTION_FAN] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_FAN_12] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_FAN_23] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_FAN_34] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_FAN_LAMBDA] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_LAMBDA_12] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_LAMBDA_23] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_LAMBDA_34] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_LAMBDA_DIAG] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_DIAG_12] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_DIAG_23] = SEPARATOR;
+  buffer_Block_1[SEP_EFI_DIAG_34] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_START] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_FR_12] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_FR_23] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_FR_FL] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_FL_12] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_FL_23] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_FL_34] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_FL_RR] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_RR_12] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_RR_23] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_RR_34] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_RR_APPS] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_APPS_12] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_APPS_IR_FL] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_FL_12] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_FL_23] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_FL_FR] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_FR_12] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_FR_23] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_FR_RL] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_RL_12] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_RL_23] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_RL_RR] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_RR_12] = SEPARATOR;
+  buffer_Block_1[SEP_DAU_IR_RR_23] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_START] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA1_12] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA1_23] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA1_34] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA_1_2] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA2_12] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA2_23] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA_2_3] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA3_12] = SEPARATOR;
+  buffer_Block_1[SEP_IMU_DATA3_23] = SEPARATOR;
+  buffer_Block_1[SEP_EBB_START] = SEPARATOR;
+	buffer_Block_1[SEP_EBB_IMU_DCU] = SEPARATOR;
+	buffer_Block_1[SEP_IMU_DCU_ACC_XY] = SEPARATOR;
+	buffer_Block_1[SEP_IMU_DCU_ACC_YZ] = SEPARATOR;
+	buffer_Block_1[SEP_IMU_DCU_ACC_GYR] = SEPARATOR;
+	buffer_Block_1[SEP_IMU_DCU_GYR_XY] = SEPARATOR;
+	buffer_Block_1[SEP_IMU_DCU_GYR_YZ] = SEPARATOR;
+  buffer_Block_1[SEP_END_FILE] = SEPARATOR;
+  buffer_Block_1[END_LINE_POSITION] = END_LINE;
+  
+  // Set all separators between channels for buffer_Block_1.
+  buffer_Block_2[SEP_EFI_START] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_HALL_12] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_HALL_23] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_HALL_34] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_HALL_H20] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_H20_12] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_H20_23] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_H20_34] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_H20_OIL] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_OIL_12] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_OIL_23] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_OIL_34] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_OIL_GEAR] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_GEAR_12] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_GEAR_23] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_GEAR_34] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_GEAR_TRACTION] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_TRACTION_12] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_TRACTION_23] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_TRACTION_34] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_TRACTION_FAN] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_FAN_12] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_FAN_23] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_FAN_34] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_FAN_LAMBDA] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_LAMBDA_12] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_LAMBDA_23] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_LAMBDA_34] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_LAMBDA_DIAG] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_DIAG_12] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_DIAG_23] = SEPARATOR;
+  buffer_Block_2[SEP_EFI_DIAG_34] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_START] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_FR_12] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_FR_23] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_FR_FL] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_FL_12] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_FL_23] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_FL_34] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_FL_RR] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_RR_12] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_RR_23] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_RR_34] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_RR_APPS] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_APPS_12] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_APPS_IR_FL] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_FL_12] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_FL_23] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_FL_FR] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_FR_12] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_FR_23] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_FR_RL] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_RL_12] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_RL_23] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_RL_RR] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_RR_12] = SEPARATOR;
+  buffer_Block_2[SEP_DAU_IR_RR_23] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_START] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA1_12] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA1_23] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA1_34] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA_1_2] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA2_12] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA2_23] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA_2_3] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA3_12] = SEPARATOR;
+  buffer_Block_2[SEP_IMU_DATA3_23] = SEPARATOR;
+  buffer_Block_2[SEP_EBB_START] = SEPARATOR;
+	buffer_Block_2[SEP_EBB_IMU_DCU] = SEPARATOR;
+	buffer_Block_2[SEP_IMU_DCU_ACC_XY] = SEPARATOR;
+	buffer_Block_2[SEP_IMU_DCU_ACC_YZ] = SEPARATOR;
+	buffer_Block_2[SEP_IMU_DCU_ACC_GYR] = SEPARATOR;
+	buffer_Block_2[SEP_IMU_DCU_GYR_XY] = SEPARATOR;
+	buffer_Block_2[SEP_IMU_DCU_GYR_YZ] = SEPARATOR;
+  buffer_Block_2[SEP_END_FILE] = SEPARATOR;
+  buffer_Block_2[END_LINE_POSITION] = END_LINE;
+  
+  // Set all separators between channels for dcu_Debug_Packet.
+  dcu_Debug_Packet[SEP_DCU_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_DAU_FR_TEMP] = SEPARATOR;
+  dcu_Debug_Packet[SEP_DAU_FR_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_DAU_FL_TEMP] = SEPARATOR;
+  dcu_Debug_Packet[SEP_DAU_FL_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_DAU_REAR_TEMP] = SEPARATOR;
+  dcu_Debug_Packet[SEP_DAU_REAR_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_SW_TEMP] = SEPARATOR;
+  dcu_Debug_Packet[SEP_EBB_TEMP] = SEPARATOR;
+  dcu_Debug_Packet[SEP_EBB_BOARD_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_EBB_MOTOR_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_GCU_TEMP] = SEPARATOR;
+  dcu_Debug_Packet[SEP_FANS_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_H2O_PUMP_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_FUEL_PUMP_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_GEARMOTOR_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_CLUTCH_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[SEP_DRS_CURRENT] = SEPARATOR;
+  dcu_Debug_Packet[DEBUG_PACKET_END_LINE] = END_LINE;
+  
+  // Set all separators between channels for dcu_State_Packet.
+  dcu_State_Packet[0] = 'M';
+  dcu_State_Packet[DCU_STATE_PACKET_USB_PRESENT] = UDP_DCU_STATE_ERROR;
+  dcu_State_Packet[DCU_STATE_PACKET_USB_READY] = UDP_DCU_STATE_ERROR;
+  dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] = UDP_DCU_STATE_ERROR;
+  dcu_State_Packet[DCU_STATE_PACKET_TELEMETRY_ON] = UDP_DCU_STATE_ERROR;
+  dcu_State_Packet[DCU_STATE_PACKET_SD_PRESENT] = UDP_DCU_STATE_ERROR;
+  dcu_State_Packet[DCU_STATE_PACKET_SD_READY] = UDP_DCU_STATE_ERROR;
+  dcu_State_Packet[BUFFER_STATE_LEN - 1] = '\0';
+}
+
+
+// Funzione di conversione dati, identificati in base all'ID del relativo pacchetto CAN
+// La funzione va richiamata nella callback di ricezione pacchetti CAN, con gli opportuni parametri
+// Il primo parametro è l'ID del pacchetto da convertire e il secondo è l'array degli 8 byte di dato
+extern inline void data_Conversion(uint16_t ID, uint8_t payload[8])
+{
+  data0 = payload[0] & 0x00FF;
+  data1 = payload[1] & 0x00FF;
+  data2 = payload[2] & 0x00FF;
+  data3 = payload[3] & 0x00FF;
+  data4 = payload[4] & 0x00FF;
+  data5 = payload[5] & 0x00FF;
+  data6 = payload[6] & 0x00FF;
+  data7 = payload[7] & 0x00FF;
+    
+  switch(ID)
+  {          
+    
+    /**********************EFI**********************/
+        
+    case EFI_HALL_ID:
+
+      // HALL_EFFECT_FR byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      decimal_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[HALL_EFFECT_FR], 3, 1);
+      
+      // HALL_EFFECT_FL byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      decimal_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[HALL_EFFECT_FL], 3, 1);
+      
+      // HALL_EFFECT_RR byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      decimal_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[HALL_EFFECT_RR], 3, 1);
+      
+      // HALL_EFFECT_RR byte 6-7
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      decimal_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[HALL_EFFECT_RR], 3, 1);
+      break;
+        
+    case EFI_WATER_TEMPERATURE_ID:
+        
+      // T_H20_SX_IN byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      fTemp = temperature_Efi_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_H20_SX_IN], 3);
+      
+      // T_H20_SX_OUT byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      fTemp = temperature_Efi_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_H20_SX_OUT], 3);
+      
+      // T_H20_DX_IN byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      fTemp = temperature_Efi_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_H20_DX_IN], 3);
+      
+      // T_H20_DX_OUT byte 6-7
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      fTemp = temperature_Efi_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_H20_DX_OUT], 3);
+      break;
+
+    case EFI_OIL_T_ENGINE_BAT_ID:
+        
+      // T_OIL_IN byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      fTemp = T_OIL_IN_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_OIL_IN], 3);
+      
+      // T_OIL_OUT byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      fTemp = temperature_Efi_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_OIL_OUT], 3);
+   
+      // T_H20_ENGINE byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      fTemp = T_H20_ENGINE_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_H20_ENGINE], 3);
+      
+      // BATTERY_VOLTAGE byte 6-7
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      fTemp = BATT_VOLTAGE_Conversion(uTemp);
+      decimal_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[BATTERY_VOLTAGE], 2, 1);
+      break;
+
+    case EFI_GEAR_RPM_TPS_APPS_ID:
+        
+      // GEAR byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[GEAR], 1);
+    
+      // RPM byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[RPM], 5);
+    
+      // TPS_1 byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      fTemp = TPS_1_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[TPS_1], 3);
+    
+      // PEDAL_POSITION_AVG byte 6-7
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      fTemp = PEDAL_POS_AVG_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[PEDAL_POSITION_AVG], 3);
+      break;
+        
+    case EFI_TRACTION_CONTROL_ID:
+        
+      // VH_SPEED byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      decimal_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[VH_SPEED], 3, 1);
+      
+      // SLIP_TARGET byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      decimal_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[SLIP_TARGET], 3, 1);
+      
+      // SLIP byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      decimal_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[SLIP], 3, 1);
+      break;
+        
+    case EFI_FUEL_FAN_H2O_LAUNCH_ID:
+        
+      // FUEL_PUMP byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[FUEL_PUMP], 1);
+  
+      // FAN byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[FAN], 1);
+      
+      // H20_PUMP_DUTY_CYCLE byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      uTemp = uTemp * 100;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[H20_PUMP_DUTY_CYCLE], 3);
+      
+      // LAUNCH_CONTROL_ACTIVE byte 6-7
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[LAUNCH_CONTROL_ACTIVE], 1);
+      break;
+        
+    case EFI_PRESSURES_LAMBDA_SMOT_ID:
+        
+      // FUEL_PRESSURE byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[FUEL_PRESSURE], 5);
+    
+      // OIL_PRESSURE byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[OIL_PRESSURE], 5);
+    
+      // LAMBDA byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      decimal_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[LAMBDA], 1, 3);
+      
+      // FLAG_SMOT byte 6-7
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[FLAG_SMOT], 2);
+      break;
+    
+    case EFI_DIAG_IGN_EXHAUST_ID:
+        
+      // DIAG_IGN_1 byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[DIAG_IGN_1], 1);
+      
+      // DIAG_IGN_2 byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[DIAG_IGN_2], 1);
+      
+      // T_SCARICO_1 byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      fTemp = T_SCARICO_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_SCARICO_1], 3);
+      
+      // T_SCARICO_2 byte 6-7
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      fTemp = T_SCARICO_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[T_SCARICO_2], 3);
+      break;
+    
+    
+    /**********************DAU**********************/
+        
+    case DAU_FR_ID:
+      
+      // LINEARE_FR byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[LINEARE_FR], 5);
+      
+      // LOAD_CELL_FR byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      fTemp = LOAD_CELL_FR_Conversion(uTemp);
+      int_To_String((uint16_t)fTemp, &buffer_Block[LOAD_CELL_FR], 5);
+      
+      // BPS_FRONT byte 3-4
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[BPS_FRONT], 5);
+      break;
+        
+    case DAU_FL_ID:
+        
+      // LINEARE_FL byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[LINEARE_FL], 5);
+      
+      // LOAD_CELL_FL byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      fTemp = LOAD_CELL_FL_Conversion(uTemp);
+      int_To_String((uint16_t)fTemp, &buffer_Block[LOAD_CELL_FL], 5);
+      
+      // BPS_REAR byte 3-4
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[BPS_REAR], 5);
+      
+      // STEERING_WHEEL_ANGLE byte 5-6
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[STEERING_WHEEL_ANGLE], 5);
+      break;
+        
+    case DAU_REAR_ID:
+        
+      // LINEARE_RL byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[LINEARE_RL], 5);
+      
+      // LOAD_CELL_RL byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      fTemp = LOAD_CELL_RL_Conversion(uTemp);
+      int_To_String((uint16_t)fTemp, &buffer_Block[LOAD_CELL_RL], 5);
+      
+      // LINEARE_RR byte 3-4
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[LINEARE_RR], 5);
+      
+      // LOAD_CELL_RR byte 5-6
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      fTemp = LOAD_CELL_RR_Conversion(uTemp);
+      int_To_String((uint16_t)fTemp, &buffer_Block[LOAD_CELL_RR], 5);
+      break;
+        
+    case DAU_FR_APPS_ID:
+        
+      // APPS1 byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[APPS1], 5);
+      
+      // APPS2 byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[APPS2], 5);
+      break;
+        
+    case IR_FL_ID:
+        
+      // IR1_FL byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR1_FL], 5);
+      
+      // IR2_FL byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR2_FL], 5);
+      
+      // IR3_FL byte 3-4
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR3_FL], 5);
+      break;
+        
+    case IR_FR_ID:
+        
+      // IR1_FR byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR1_FR], 5);
+      
+      // IR2_FR byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR2_FR], 5);
+
+      // IR3_FR byte 3-4
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR3_FR], 5);       
+      break;
+        
+    case IR_RL_ID:
+        
+      // IR1_RL byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR1_RL], 5);
+      
+      // IR2_RL byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR2_RL], 5);
+      
+      // IR3_RL byte 3-4
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR3_RL], 5);
+      break;
+        
+    case IR_RR_ID:
+        
+      // IR1_RR byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR1_RR], 5);
+      
+      // IR2_RR byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR2_RR], 5);
+      
+      // IR3_RR byte 3-4
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[IR3_RR], 5);
+      break;
+        
+        
+    /**********************IMU**********************/
+    
+    case IMU_DATA_1_ID:
+        
+      // ACC_X X byte 0-1
+      iTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      decimal_To_String((int16_t)iTemp, &buffer_Block[ACC_X], 3, 2);
+      
+      // ACC_Y byte 2-3
+      iTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      decimal_To_String((int16_t)iTemp, &buffer_Block[ACC_Y], 3, 2);
+      
+      // GYR_X byte 4-5
+      iTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      fTemp = GYR_Conversion(iTemp);
+      decimal_To_String((int16_t)fTemp, &buffer_Block[GYR_X], 3, 2);
+      
+      // GYR_Z byte 6-7
+      iTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      fTemp = GYR_Conversion(iTemp);
+      decimal_To_String((int16_t)fTemp, &buffer_Block[GYR_Z], 3, 2);
+      break;
+        
+    case IMU_DATA_2_ID:
+        
+      // HEADING byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      fTemp = HEADING_Conversion(uTemp);
+      int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[HEADING], 3);
+      
+      // ACC_Z byte 2-3
+      iTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      decimal_To_String((int16_t)iTemp, &buffer_Block[ACC_Z], 3, 2);
+      
+      // GYR_Y byte 4-5
+      iTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      fTemp = GYR_Conversion(iTemp);
+      decimal_To_String((int16_t)fTemp, &buffer_Block[GYR_Y], 3, 2);
+      break;
+        
+    case IMU_DATA_3_ID:
+        
+      // GPS_X byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[GPS_X], 5);
+      
+      // GPS_Y byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[GPS_Y], 5);
+      
+      // VELOCITY byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      decimal_To_String((uint16_t)uTemp, &buffer_Block[VELOCITY], 3, 2);
+      break;
+        
+    
+    /**********************EBB**********************/
+        
+    case EBB_BIAS_ID:
+        
+      // BIAS_POSITION byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &buffer_Block[BIAS_POSITION], 5);
+      break;
+  }
+}
+
+
+extern inline void Imu_Dcu_Conversion_To_Buffer(void)
+{
+	//ACC X
+  iTemp = (((uint16_t)imu_Acc_Raw_Data[1] << 8) & 0xFF00) | ((uint16_t)imu_Acc_Raw_Data[0] & 0x00FF);
+  decimal_To_String((int16_t)iTemp, &buffer_Block[DCU_ACC_X], 3, 2);
+
+	//ACC Y
+  iTemp = (((uint16_t)imu_Acc_Raw_Data[3] << 8) & 0xFF00) | ((uint16_t)imu_Acc_Raw_Data[2] & 0x00FF);
+	decimal_To_String((int16_t)iTemp, &buffer_Block[DCU_ACC_Y], 3, 2);
+	
+	//ACC Z
+  iTemp = (((uint16_t)imu_Acc_Raw_Data[5] << 8) & 0xFF00) | ((uint16_t)imu_Acc_Raw_Data[4] & 0x00FF);
+	decimal_To_String((int16_t)iTemp, &buffer_Block[DCU_ACC_Z], 3, 2);
+	
+  
+  
+  
+  
+	//GYR X
+  uTemp = (((uint16_t)imu_Gyr_Heading_Raw_Data[7] << 8) & 0xFF00) | ((uint16_t)imu_Gyr_Heading_Raw_Data[6] & 0x00FF);
+  fTemp = HEADING_Conversion((int16_t)iTemp);
+  decimal_To_String((int16_t)fTemp, &buffer_Block[DCU_GYR_X], 3, 2);
+	
+	//GYR Y
+  uTemp = (((uint16_t)imu_Gyr_Heading_Raw_Data[7] << 8) & 0xFF00) | ((uint16_t)imu_Gyr_Heading_Raw_Data[6] & 0x00FF);
+  fTemp = HEADING_Conversion((int16_t)iTemp);
+  decimal_To_String((int16_t)fTemp, &buffer_Block[DCU_GYR_Y], 3, 2);
+	
+	//GYR Z
+  uTemp = (((uint16_t)imu_Gyr_Heading_Raw_Data[7] << 8) & 0xFF00) | ((uint16_t)imu_Gyr_Heading_Raw_Data[6] & 0x00FF);
+  fTemp = HEADING_Conversion((int16_t)iTemp);
+  decimal_To_String((int16_t)fTemp, &buffer_Block[DCU_GYR_Z], 3, 2);
+
+	//HEADING
+  uTemp = (((uint16_t)imu_Gyr_Heading_Raw_Data[7] << 8) & 0xFF00) | ((uint16_t)imu_Gyr_Heading_Raw_Data[6] & 0x00FF);
+  fTemp = HEADING_Conversion(uTemp);
+  int_To_String_Unsigned((uint16_t)fTemp, &buffer_Block[DCU_HEADING], 3);
+}
+
+
+extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8])
+{
+  data0 = payload[0] & 0x00FF;
+  data1 = payload[1] & 0x00FF;
+  data2 = payload[2] & 0x00FF;
+  data3 = payload[3] & 0x00FF;
+  data4 = payload[4] & 0x00FF;
+  data5 = payload[5] & 0x00FF;
+  data6 = payload[6] & 0x00FF;
+  data7 = payload[7] & 0x00FF;
+    
+  switch(ID)
+  {
+    case DAU_FR_DEBUG_ID:
+      
+      // DAU_FR_TEMP byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_FR_TEMP], 3);
+      
+      // DAU_FR_CURRENT byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_FR_CURRENT], 4);
+      break;
+    
+    case DAU_FL_DEBUG_ID:
+      
+      // DAU_FL_TEMP byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_FL_TEMP], 3);
+      
+      // DAU_FL_CURRENT byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_FL_CURRENT], 4);
+      break;
+        
+    case DAU_REAR_DEBUG_ID:
+      
+      // DAU_REAR_TEMP byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_REAR_TEMP], 3);
+      
+      // DAU_REAR_CURRENT byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_REAR_CURRENT], 4);
+      break;
+    
+    case SW_DEBUG_ID:
+      
+      // SW_TEMP byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_SW_TEMP], 3);
+      break;
+    
+    case EBB_DEBUG_ID:
+      
+      // EBB_TEMP byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_EBB_TEMP], 3);
+      
+      // EBB_BOARD_CURRENT byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_EBB_BOARD_CURRENT], 4);
+      
+      // EBB_MOTOR_CURRENT byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_EBB_MOTOR_CURRENT], 4);
+      break;
+    
+    case GCU_DEBUG_1_ID:
+      
+      // GCU_TEMP byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_GCU_TEMP], 3);
+      
+      // FANS_CURRENT byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_FANS_CURRENT], 5);
+      
+      // H2O_PUMP_CURRENT byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_H2O_PUMP_CURRENT], 5);
+      
+      // FUEL_PUMP_CURRENT byte 6-7
+      uTemp = ((data6 << 8 ) & 0xFF00) | data7;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_FUEL_PUMP_CURRENT], 5);
+      break;
+    
+    case GCU_DEBUG_2_ID:
+      
+      // GEARMOTOR_CURRENT byte 0-1
+      uTemp = ((data0 << 8 ) & 0xFF00) | data1;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_GEARMOTOR_CURRENT], 5);
+      
+      // CLUTCH_CURRENT byte 2-3
+      uTemp = ((data2 << 8 ) & 0xFF00) | data3;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_CLUTCH_CURRENT], 5);
+      
+      // DRS_CURRENT byte 4-5
+      uTemp = ((data4 << 8 ) & 0xFF00) | data5;
+      int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DRS_CURRENT], 5);
+      break;
+  }
+}
+
+
+static inline float GYR_Conversion(uint16_t input)
+{
+  // Conversione dato: input * 0,0625
+  // Tengo già conto di moltiplicare per 100 la conversione, per la formattazione della stringa
+  return (((float)input / (float)16) * (float)100);
+}
+
+
+static inline float HEADING_Conversion(uint16_t input)
+{
+  // Conversione dato: input / 16
+  return (((float)input / (float)16));
+}
+
+
+static inline float temperature_Efi_Conversion(uint16_t input)
+{
+  // La conversione è quella corretta
+  // NON per essere usata con le funzioni di conversione decimale in string_utility
+  return (((float)(-0.35572) * (float)input) + (float)190.95);
+}
+
+
+static inline float T_SCARICO_Conversion(uint16_t input)
+{
+  // La conversione è quella corretta
+  // NON per essere usata con le funzioni di conversione decimale in string_utility
+  return (((float)1.24626 * (float)input) - (float)24.925);
+}
+
+
+static inline float T_OIL_IN_Conversion(uint16_t input)
+{
+  // La conversione è quella corretta
+  // NON per essere usata con le funzioni di conversione decimale in string_utility
+  return (((float)(-0.36094) * (float)input) + (float)196.36);
+}
+
+
+static inline float T_H20_ENGINE_Conversion(uint16_t input)
+{
+  // La conversione è quella corretta
+  // NON per essere usata con le funzioni di conversione decimale in string_utility
+  return (((float)0.625 * (float)input) - (float)10);
+}
+
+
+static inline float BATT_VOLTAGE_Conversion(uint16_t input)
+{
+  // Conversione dato: input * 0,01758
+  // Tengo già conto di moltiplicare per 10 la conversione, per la formattazione della stringa
+  return (((float)0.01758 * (float)input) * (float)10);
+}
+
+
+static inline float TPS_1_Conversion(uint16_t input)
+{
+  return ((float)0.39216 * input);
+}
+
+
+static inline float PEDAL_POS_AVG_Conversion(uint16_t input)
+{
+  return ((float)0.09775 * (float)input);
+}
+
+
+static inline float LOAD_CELL_FL_Conversion(uint16_t input)
+{  
+  // Da sottrarre l'offsett a vuoto
+  // Modificare la define, con il valore espresso in Newton
+  return ((((float)input / (float)4095 - (float)0.5) * ((float)4448 / ((float)0.002 * (float)50.4))) - LOAD_CELL_FL_OFFSET);
+}
+
+
+static inline float LOAD_CELL_FR_Conversion(uint16_t input)
+{
+  // Da sottrarre l'offsett a vuoto
+  // Modificare la define, con il valore espresso in Newton
+  return ((((float)input / (float)4095 - (float)0.5) * ((float)4448 / ((float)0.002 * (float)50.4))) - LOAD_CELL_FR_OFFSET);
+}
+
+
+static inline float LOAD_CELL_RL_Conversion(uint16_t input)
+{
+  // Da sottrarre l'offsett a vuoto
+  // Modificare la define, con il valore espresso in Newton
+  return ((((float)input / (float)4095 - (float)0.5) * ((float)4448 / ((float)0.002 * (float)50.4))) - LOAD_CELL_RL_OFFSET);
+}
+
+
+static inline float LOAD_CELL_RR_Conversion(uint16_t input)
+{
+  // Da sottrarre l'offsett a vuoto
+  // Modificare la define, con il valore espresso in Newton
+  return ((((float)input / (float)4095 - (float)0.5) * ((float)4448 / ((float)0.002 * (float)50.4))) - LOAD_CELL_RR_OFFSET);
+}

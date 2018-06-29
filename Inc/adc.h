@@ -58,12 +58,17 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+   
 /* USER CODE END Includes */
 
 extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN Private defines */
+
+#define LSB_12_BIT_MV (0.0008056640625f)
+   
+extern uint16_t DCU_Debug_Temperature;
+extern uint16_t DCU_Debug_Current;
 
 /* USER CODE END Private defines */
 
@@ -72,6 +77,9 @@ extern void _Error_Handler(char *, int);
 void MX_ADC1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+
+extern inline void dcu_Debug_Get_Data(void);
+static inline void dcu_Debug_Data_Processing(void);
 
 /* USER CODE END Prototypes */
 

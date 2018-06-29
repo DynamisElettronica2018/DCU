@@ -55,10 +55,9 @@
 
 /* USER CODE BEGIN Includes */
 
-#include "user_defines.h"
-#include "user_externalVariables.h"
 #include "telemetry_command.h"
 #include "fatfs.h"
+#include "data.h"
 #include "user_ethernet_udp.h"
 
 /* USER CODE END Includes */
@@ -139,8 +138,8 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
       
     case HOST_USER_DISCONNECTION:
       Appli_state = APPLICATION_DISCONNECT;
-      usb_Ready = UDP_DCU_STATE_ERROR;
-      usb_Present = UDP_DCU_STATE_ERROR;
+      dcu_State_Packet[DCU_STATE_PACKET_USB_READY] = UDP_DCU_STATE_ERROR;
+      dcu_State_Packet[DCU_STATE_PACKET_USB_PRESENT] = UDP_DCU_STATE_ERROR;
       
       if(f_mount(NULL, (TCHAR const *)"", 1) != FR_OK)
       {
@@ -159,14 +158,14 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
       
       else
       {
-        usb_Ready = UDP_DCU_STATE_OK;
+        dcu_State_Packet[DCU_STATE_PACKET_USB_READY] = UDP_DCU_STATE_OK;
       }
   
       break;
 
     case HOST_USER_CONNECTION:
       Appli_state = APPLICATION_START;
-      usb_Present = UDP_DCU_STATE_OK;
+      dcu_State_Packet[DCU_STATE_PACKET_USB_PRESENT] = UDP_DCU_STATE_OK;
       break;
 
     default:

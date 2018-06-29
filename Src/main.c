@@ -55,9 +55,7 @@
 #include "i2c.h"
 #include "lwip.h"
 #include "rtc.h"
-#include "sdmmc.h"
 #include "tim.h"
-#include "usart.h"
 #include "usb_host.h"
 #include "gpio.h"
 
@@ -67,8 +65,13 @@
 #include "telemetry_command.h"
 #include "system.h"
 #include "usbh_platform.h"
-#include "user_usb.h"
 #include "data.h"
+#include "user_usb.h"
+//#include "user_sd.h"
+#include "user_ethernet_udp.h"
+#include "bno055.h"
+#include "string_utility.h"
+#include "can_id_defines.h"
 
 /* USER CODE END Includes */
 
@@ -77,45 +80,13 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
-char USB_Filename[20];
-volatile uint32_t timestamp = 0;
-volatile uint8_t canStartAcquisitionRequest = 0;
-volatile uint8_t usbBlockWriteFlag = 0;
-uint8_t *bufferBlockWrite = NULL;
-uint32_t LED_Actual_Time = 0;
-uint32_t LED_Toogle_Time = 0;
-
-UDP_Send_Buffer_t UDP_Send_Buffer[UDP_SEND_BUFFER_LEN];
-UDP_Receive_Buffer_t UDP_Receive_Buffer[UDP_RECEIVE_BUFFER_LEN];
-uint8_t IP_ADDR0 = 0;
-uint8_t IP_ADDR1 = 0;
-uint8_t IP_ADDR2 = 0;
-uint8_t IP_ADDR3 = 0;
-uint8_t NETMASK_ADDR0 = 0;
-uint8_t NETMASK_ADDR1 = 0;
-uint8_t NETMASK_ADDR2 = 0;
-uint8_t NETMASK_ADDR3 = 0;
-uint8_t GW_ADDR0 = 0;
-uint8_t GW_ADDR1 = 0;
-uint8_t GW_ADDR2 = 0;
-uint8_t GW_ADDR3 = 0;
-uint16_t UDP_Send_Buffer_Index = 0;
-uint16_t UDP_Read_Buffer_Index = 0;
-volatile uint16_t UDP_Queue_Buffer_Index = 0;
-volatile uint16_t UDP_Receive_Buffer_Index = 0;
-
-uint8_t usb_Present = UDP_DCU_STATE_ERROR;
-uint8_t usb_Ready = UDP_DCU_STATE_ERROR;
-volatile uint8_t acquisition_On = UDP_DCU_STATE_ERROR;
-volatile uint8_t telemetry_On = UDP_DCU_STATE_ERROR;
-
-//END MAIN Variables
+//volatile static uint32_t packet_Fifo0_Counted = 0;
+//volatile static uint32_t packet_Fifo1_Counted = 0;
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_NVIC_Init(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
@@ -160,82 +131,63 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_I2C4_Init();
-  MX_USART1_UART_Init();
+  MX_TIM5_Init();
   MX_TIM6_Init();
   MX_TIM7_Init();
-  MX_SDMMC1_SD_Init();
   MX_RTC_Init();
-  MX_USB_HOST_Init();
-  MX_LWIP_Init();
-  MX_FATFS_Init();
   MX_ADC1_Init();
   MX_CAN1_Init();
-  MX_CAN3_Init();
-
-  /* Initialize interrupts */
-  MX_NVIC_Init();
+  MX_USB_HOST_Init();
+  MX_FATFS_Init();
+  MX_LWIP_Init();
+  MX_I2C4_Init();
   /* USER CODE BEGIN 2 */
   
-  MX_DriverVbusHS(USB_VBUS_ENABLE);
+  HAL_GPIO_WritePin(KILL_CTRL_GPIO_Port, KILL_CTRL_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
-  CAN1_Init();
+  MX_DriverVbusHS(USB_VBUS_ENABLE);
+  CAN1_Start();
   UDP_Init();
-  initializeData();
-  HAL_Delay(100);
-
+  //SD_Check_And_Init();
+  initialize_Data();
+  BNO055_Init();
+  dcu_Debug_Get_Data();
+  HAL_Delay(250);
+  HAL_TIM_Base_Start_IT(&htim5);
+  HAL_TIM_Base_Start_IT(&htim6);
+//  HAL_TIM_Base_Start_IT(&htim7);
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-     // Gestione start acquisition da CAN SW
-    if(canStartAcquisitionRequest == 1)
+    if(start_Acquisition_Request == START_ACQUISITION_REQUEST)
     {
-      canStartAcquisitionRequest = 0;
-      USB_Get_File_Name(USB_Filename);
-      USB_User_Start(USB_Filename);
-      acquisition_On = UDP_DCU_STATE_OK;
+      start_Acquisition_Request = START_ACQUISITION_DONE;
+      USB_Open_File();
+			HAL_TIM_Base_Start_IT(&htim7);
     }
     
-    else if(canStartAcquisitionRequest == 2)
+    else if(start_Acquisition_Request == STOP_ACQUISITION_REQUEST)
     {
-      canStartAcquisitionRequest = 0;
-      USB_User_Stop();
-      acquisition_On = UDP_DCU_STATE_ERROR;
+      start_Acquisition_Request = START_ACQUISITION_DONE;
+      USB_Close_File();   
+			HAL_TIM_Base_Stop_IT(&htim7);
     }
     
-    // Task in background per la gestione della comunicazione ethernet
-    MX_LWIP_Process();
-    UDP_Send_Processig();
-    UDP_Receive_Processig();
-
   /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
   /* USER CODE BEGIN 3 */
-
-    // Task in background di controllo della scirttura del blocco USB su chiavetta
-    // Il flag viene settatto opportunamente da una funzione gestita dal timer
-    // E' fondamentale inserirla nel main perché la funzione è bloccante
-    if(usbBlockWriteFlag == 1)
-    {
-      usbBlockWriteFlag = 0;
-      USB_Write(bufferBlockWrite);
-    }
-
-    // Task in background per la gestione del LED giallo di debug
-    LED_Actual_Time = HAL_GetTick();
     
-    if((LED_Actual_Time - LED_Toogle_Time) > LED_TOOGLE_PERIOD)
-    {
-      HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-      LED_Toogle_Time = HAL_GetTick();
-    }
+    MX_LWIP_Process();
+    UDP_Send_Processig();
+    UDP_Receive_Processig();
   }
-    
+  
   /* USER CODE END 3 */
 
 }
@@ -259,13 +211,13 @@ void SystemClock_Config(void)
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE|RCC_OSCILLATORTYPE_LSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
-  RCC_OscInitStruct.LSEState = RCC_LSE_BYPASS;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 432;
+  RCC_OscInitStruct.PLL.PLLM = 4;
+  RCC_OscInitStruct.PLL.PLLN = 216;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -294,20 +246,17 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART1
-                              |RCC_PERIPHCLK_I2C4|RCC_PERIPHCLK_SDMMC1
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_I2C4
                               |RCC_PERIPHCLK_CLK48;
   PeriphClkInitStruct.PLLSAI.PLLSAIN = 192;
   PeriphClkInitStruct.PLLSAI.PLLSAIR = 2;
   PeriphClkInitStruct.PLLSAI.PLLSAIQ = 2;
-  PeriphClkInitStruct.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV4;
+  PeriphClkInitStruct.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV8;
   PeriphClkInitStruct.PLLSAIDivQ = 1;
   PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_2;
-  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
-  PeriphClkInitStruct.Usart1ClockSelection = RCC_USART1CLKSOURCE_SYSCLK;
+  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   PeriphClkInitStruct.I2c4ClockSelection = RCC_I2C4CLKSOURCE_SYSCLK;
   PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLLSAIP;
-  PeriphClkInitStruct.Sdmmc1ClockSelection = RCC_SDMMC1CLKSOURCE_CLK48;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -325,83 +274,72 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-/**
-  * @brief NVIC Configuration.
-  * @retval None
-  */
-static void MX_NVIC_Init(void)
+/* USER CODE BEGIN 4 */
+
+//1Hz
+extern inline void TIM6_IRQ_User_Handler(void)
 {
-  /* OTG_HS_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(OTG_HS_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
-  /* ETH_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(ETH_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(ETH_IRQn);
-  /* USART1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(USART1_IRQn, 15, 0);
-  HAL_NVIC_EnableIRQ(USART1_IRQn);
+  dcu_Debug_Get_Data();
+  CAN_Send_Dcu_Debug_Pakcet();
+  
+  if(dcu_State_Packet[DCU_STATE_PACKET_TELEMETRY_ON] == UDP_DCU_STATE_OK)
+	{
+		UDP_Send_Queue(UDP_DCU_STATE_PORT, dcu_State_Packet, BUFFER_STATE_LEN);
+    UDP_Send_Queue(UDP_TELEMETRY_DEBUG_PORT, dcu_Debug_Packet, BUFFER_DEBUG_LEN);
+	}
+  
+	if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_OK)
+  {
+    CAN_Send_Dcu_Is_Alive_Packet();
+  }
 }
 
-/* USER CODE BEGIN 4 */
+
+//10Hz
+extern inline void TIM5_IRQ_User_Handler(void)
+{
+  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+  
+  if(dcu_State_Packet[DCU_STATE_PACKET_TELEMETRY_ON] == UDP_DCU_STATE_OK)
+	{
+		if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_ERROR)
+		{
+			BNO055_Imu_Read_Data();
+			Imu_Dcu_Conversion_To_Buffer();
+		}
+		
+		makeDataAvg();
+		
+		UDP_Send_Queue(UDP_TELEMETRY_DATA_PORT, block_Buffer[buffer_telemetryPointer], BUFFER_BLOCK_LEN);
+	}
+}
+
+
+//100Hz
+extern inline void TIM7_IRQ_User_Handler(void)
+{
+  uint32_To_String(USB_Timestamp, block_Buffer[buffer_writePointer], 7);
+  USB_Timestamp += 10;
+  
+	BNO055_Imu_Read_Data();
+	Imu_Dcu_Conversion_To_Buffer();
+	
+	buffer_writePointer = (buffer_writePointer + 1) % BUFFER_LEN;
+	
+  USB_Write_Block(block_Buffer[buffer_readPointer]);
+	
+	buffer_readPointer = (buffer_readPointer + 1) % BUFFER_LEN;
+}
 
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  HAL_Delay(20);
-  
   if(HAL_GPIO_ReadPin(USB_OVERCURRENT_GPIO_Port, USB_OVERCURRENT_Pin) == GPIO_PIN_RESET)
   {
     MX_DriverVbusHS(USB_VBUS_DISABLE);
     HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
-    usb_Ready = UDP_DCU_STATE_ERROR;
+    dcu_State_Packet[DCU_STATE_PACKET_USB_READY] = UDP_DCU_STATE_ERROR;
     UDP_Send_Error(USB_OVERCURRENT);
-  }
-}
-
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  if(htim->Instance == TIM6)
-  {
-    if(acquisition_On == UDP_DCU_STATE_OK)
-    {
-      data10msTimerBackground();
-    }
-  }
-  
-  else if(htim->Instance == TIM7)
-  {
-    if(telemetry_On == UDP_DCU_STATE_OK)
-    {
-      data100msTimerBackground();
-    }
-  }
-}
-
-
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-  // Before starting a new communication transfer, you need to check the current
-  // state of the peripheral; if it’s busy you need to wait for the end of current
-  // transfer before starting a new one.
-  while (HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY)
-  {
-  }
-}
-
-
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-  
-}
-
-
-void HAL_Delay(__IO uint32_t Delay)
-{
-  while(Delay)
-  {
-    if(SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)
-      Delay--;
   }
 }
 

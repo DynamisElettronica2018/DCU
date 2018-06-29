@@ -58,32 +58,29 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
-#include "usart.h"
-#include "gpio.h"
-#include "user_defines.h"
-#include "user_externalVariables.h"
-
+   
 /* USER CODE END Includes */
 
 extern CAN_HandleTypeDef hcan1;
-extern CAN_HandleTypeDef hcan3;
 
 /* USER CODE BEGIN Private defines */
+   
+volatile extern uint32_t packet_Fifo0_Counter;
+volatile extern uint32_t packet_Fifo1_Counter;
 
 /* USER CODE END Private defines */
 
 extern void _Error_Handler(char *, int);
 
 void MX_CAN1_Init(void);
-void MX_CAN3_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void CAN1_FilterSetUp(void);
-void CAN1_Start(void);
-void CAN1_Init(void);
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);
-void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan);
+
+extern void CAN1_Start(void);
+extern inline void CAN_Send_Dcu_Is_Alive_Packet(void);
+extern inline void CAN_Send_Dcu_Debug_Pakcet(void);
+static void CAN1_Filter_Setup(void);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

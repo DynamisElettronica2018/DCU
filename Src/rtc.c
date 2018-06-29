@@ -53,7 +53,10 @@
 /* USER CODE BEGIN 0 */
 
 #include <string.h>
-#include "usart.h"
+
+
+static RTC_TimeTypeDef set_Time;
+static RTC_DateTypeDef set_Date;
 
 /* USER CODE END 0 */
 
@@ -68,7 +71,6 @@ void MX_RTC_Init(void)
     /**Initialize RTC Only 
     */
   hrtc.Instance = RTC;
-if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != 0x32F2){
   hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
   hrtc.Init.AsynchPrediv = 127;
   hrtc.Init.SynchPrediv = 255;
@@ -79,10 +81,13 @@ if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != 0x32F2){
   {
     _Error_Handler(__FILE__, __LINE__);
   }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
 
     /**Initialize RTC and set the Time and Date 
     */
-  sTime.Hours = 0x0;
+  sTime.Hours = 0x12;
   sTime.Minutes = 0x0;
   sTime.Seconds = 0x0;
   sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
@@ -91,19 +96,22 @@ if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != 0x32F2){
   {
     _Error_Handler(__FILE__, __LINE__);
   }
+  /* USER CODE BEGIN RTC_Init 3 */
 
-  sDate.WeekDay = RTC_WEEKDAY_MONDAY;
-  sDate.Month = RTC_MONTH_JANUARY;
-  sDate.Date = 0x1;
-  sDate.Year = 0x0;
+  /* USER CODE END RTC_Init 3 */
+
+  sDate.WeekDay = RTC_WEEKDAY_FRIDAY;
+  sDate.Month = RTC_MONTH_JUNE;
+  sDate.Date = 0x8;
+  sDate.Year = 0x18;
 
   if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
+  /* USER CODE BEGIN RTC_Init 4 */
 
-    HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0x32F2);
-  }
+  /* USER CODE END RTC_Init 4 */
 
 }
 
@@ -148,26 +156,37 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* rtcHandle)
   date values. */
 
 
-extern inline HAL_StatusTypeDef RTC_Get_Value(RTC_DateTypeDef *date, RTC_TimeTypeDef *time)
+extern inline void RTC_Get_Value(RTC_DateTypeDef *date, RTC_TimeTypeDef *time)
 { 
-  HAL_StatusTypeDef RTC_Error;
-  
-  RTC_Error = HAL_RTC_GetTime(&hrtc, time, RTC_FORMAT_BIN);
-  RTC_Error = HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
-  
-  return RTC_Error;
+  HAL_RTC_GetTime(&hrtc, time, RTC_FORMAT_BIN);
+  HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
 }
 
 
-extern inline HAL_StatusTypeDef RTC_Get_Value_With_Subseconds(RTC_DateTypeDef *date, RTC_TimeTypeDef *time, uint32_t *subseconds)
-{ 
-  HAL_StatusTypeDef RTC_Error;
-  
-  RTC_Error = HAL_RTC_GetTime(&hrtc, time, RTC_FORMAT_BIN);
-  RTC_Error = HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
+extern inline void RTC_Get_Value_With_Subseconds(RTC_DateTypeDef *date, RTC_TimeTypeDef *time, uint32_t *subseconds)
+{  
+  HAL_RTC_GetTime(&hrtc, time, RTC_FORMAT_BIN);
+  HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
   *subseconds  = ((time->SecondFraction - time->SubSeconds) * 1000) / (time->SecondFraction + 1);
-  
-  return RTC_Error;
+}
+
+
+extern void set_Rtc_Time(uint8_t hours, uint8_t minutes, uint8_t seconds)
+{
+  set_Time.Hours = hours;
+  set_Time.Minutes = minutes;
+  set_Time.Seconds = seconds;
+  HAL_RTC_SetTime(&hrtc, &set_Time, RTC_FORMAT_BIN);
+}
+
+
+extern void set_Rtc_Date(uint8_t weekday, uint8_t month, uint8_t date, uint8_t year)
+{
+  set_Date.WeekDay = weekday;
+  set_Date.Month = month;
+  set_Date.Date = date;
+  set_Date.Year = year;
+  HAL_RTC_SetDate(&hrtc, &set_Date, RTC_FORMAT_BIN);
 }
 
 

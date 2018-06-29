@@ -58,8 +58,6 @@
 
 /* USER CODE BEGIN 0 */
 
-#include "user_defines.h"
-#include "user_externalVariables.h"
 #include "user_ethernet_udp.h"
 
 /* USER CODE END 0 */
@@ -134,19 +132,8 @@ void MX_LWIP_Init(void)
   /* Create the Ethernet link handler thread */
 
 /* USER CODE BEGIN 3 */
-    
-  IP_ADDR0 = IP_ADDRESS[0];
-  IP_ADDR1 = IP_ADDRESS[1];
-  IP_ADDR2 = IP_ADDRESS[2];
-  IP_ADDR3 = IP_ADDRESS[3];
-  NETMASK_ADDR0 = NETMASK_ADDRESS[0];
-  NETMASK_ADDR1 = NETMASK_ADDRESS[1];
-  NETMASK_ADDR2 = NETMASK_ADDRESS[2];
-  NETMASK_ADDR3 = NETMASK_ADDRESS[3];
-  GW_ADDR0 = GATEWAY_ADDRESS[0];
-  GW_ADDR1 = GATEWAY_ADDRESS[1];
-  GW_ADDR2 = GATEWAY_ADDRESS[2];
-  GW_ADDR3 = GATEWAY_ADDRESS[3];
+
+  netif_set_status_callback(&gnetif, netif_status_callback);
 
 /* USER CODE END 3 */
 }
@@ -181,6 +168,9 @@ void MX_LWIP_Process(void)
   sys_check_timeouts();
 
 /* USER CODE BEGIN 4_3 */
+  
+  ethernetif_set_link(&gnetif);
+  
 /* USER CODE END 4_3 */
 }
 

@@ -56,16 +56,12 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
-void PVD_IRQHandler(void);
 void EXTI0_IRQHandler(void);
 void ADC_IRQHandler(void);
 void CAN1_TX_IRQHandler(void);
 void CAN1_RX0_IRQHandler(void);
 void CAN1_RX1_IRQHandler(void);
-void CAN1_SCE_IRQHandler(void);
-void USART1_IRQHandler(void);
-void EXTI15_10_IRQHandler(void);
-void SDMMC1_IRQHandler(void);
+void TIM5_IRQHandler(void);
 void TIM6_DAC_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void DMA2_Stream0_IRQHandler(void);
@@ -75,10 +71,6 @@ void OTG_HS_EP1_IN_IRQHandler(void);
 void OTG_HS_IRQHandler(void);
 void I2C4_EV_IRQHandler(void);
 void I2C4_ER_IRQHandler(void);
-void CAN3_TX_IRQHandler(void);
-void CAN3_RX0_IRQHandler(void);
-void CAN3_RX1_IRQHandler(void);
-void CAN3_SCE_IRQHandler(void);
 
 #ifdef __cplusplus
 }
