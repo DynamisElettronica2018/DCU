@@ -65,91 +65,111 @@
 #define FLAG_SMOT               ((uint16_t)127)
 
 /*EFI_DIAG_IGN_EXHAUST_ID*/
-#define DIAG_IGN_1              ((uint16_t)130)
-#define DIAG_IGN_2              ((uint16_t)132)
-#define T_SCARICO_1             ((uint16_t)134)
-#define T_SCARICO_2             ((uint16_t)138)
+#define DIAG_IGN_1              ((uint16_t)133)
+#define DIAG_IGN_2              ((uint16_t)135)
+#define T_SCARICO_1             ((uint16_t)137)
+#define T_SCARICO_2             ((uint16_t)141)
 
 
 /************************** DAU ***************************/
 
 /*DAU_FR_ID*/
-#define LINEARE_FR              ((uint16_t)142)
-#define LOAD_CELL_FR            ((uint16_t)148)
-#define BPS_FRONT               ((uint16_t)154)
+#define LINEARE_FR              ((uint16_t)145)
+#define LOAD_CELL_FR            ((uint16_t)151)
+#define BPS_FRONT               ((uint16_t)157)
 
 /*DAU_FL_ID*/
-#define LINEARE_FL              ((uint16_t)160)
-#define LOAD_CELL_FL            ((uint16_t)166)
-#define BPS_REAR                ((uint16_t)172)
-#define STEERING_WHEEL_ANGLE    ((uint16_t)178)
+#define LINEARE_FL              ((uint16_t)163)
+#define LOAD_CELL_FL            ((uint16_t)169)
+#define BPS_REAR                ((uint16_t)175)
+#define STEERING_WHEEL_ANGLE    ((uint16_t)181)
 
 /*DAU_REAR_ID*/
-#define LINEARE_RL              ((uint16_t)184)
-#define LOAD_CELL_RL            ((uint16_t)190)
-#define LINEARE_RR              ((uint16_t)196)
-#define LOAD_CELL_RR            ((uint16_t)202)
+#define LINEARE_RL              ((uint16_t)187)
+#define LOAD_CELL_RL            ((uint16_t)193)
+#define LINEARE_RR              ((uint16_t)199)
+#define LOAD_CELL_RR            ((uint16_t)205)
 
 /*DAU_FR_APPS_ID*/
-#define APPS1                   ((uint16_t)208)
-#define APPS2                   ((uint16_t)214)
+#define APPS1                   ((uint16_t)211)
+#define APPS2                   ((uint16_t)217)
 
 /*IR_FL_ID*/
-#define IR1_FL                  ((uint16_t)220)
-#define IR2_FL                  ((uint16_t)226)
-#define IR3_FL                  ((uint16_t)232)
+#define IR1_FL                  ((uint16_t)223)
+#define IR2_FL                  ((uint16_t)229)
+#define IR3_FL                  ((uint16_t)235)
 
 /*IR_FR_ID*/
-#define IR1_FR                  ((uint16_t)238)
-#define IR2_FR                  ((uint16_t)244)
-#define IR3_FR                  ((uint16_t)250)
+#define IR1_FR                  ((uint16_t)241)
+#define IR2_FR                  ((uint16_t)247)
+#define IR3_FR                  ((uint16_t)253)
 
 /*IR_RL_ID*/
-#define IR1_RL                  ((uint16_t)256)
-#define IR2_RL                  ((uint16_t)262)
-#define IR3_RL                  ((uint16_t)268)
+#define IR1_RL                  ((uint16_t)259)
+#define IR2_RL                  ((uint16_t)265)
+#define IR3_RL                  ((uint16_t)271)
 
 /*IR_RR_ID*/
-#define IR1_RR                  ((uint16_t)274)
-#define IR2_RR                  ((uint16_t)280)
-#define IR3_RR                  ((uint16_t)286)
-
+#define IR1_RR                  ((uint16_t)277)
+#define IR2_RR                  ((uint16_t)283)
+#define IR3_RR                  ((uint16_t)289)
 
 /************************** IMU ***************************/
 
 /*IMU_DATA_1_ID*/
-#define ACC_X                   ((uint16_t)292)
-#define ACC_Y                   ((uint16_t)300)
-#define GYR_X                   ((uint16_t)308)
-#define GYR_Z                   ((uint16_t)316)
+#define ACC_X                   ((uint16_t)295)
+#define ACC_Y                   ((uint16_t)303)
+#define GYR_X                   ((uint16_t)311)
+#define GYR_Z                   ((uint16_t)319)
 
 /*IMU_DATA_2_ID*/
-#define HEADING                 ((uint16_t)324)
-#define ACC_Z                   ((uint16_t)328)
-#define GYR_Y                   ((uint16_t)336)
+#define HEADING                 ((uint16_t)327)
+#define ACC_Z                   ((uint16_t)331)
+#define GYR_Y                   ((uint16_t)339)
 
 /*IMU_DATA_3_ID*/
-#define GPS_X                   ((uint16_t)344)
-#define GPS_Y                   ((uint16_t)350)
-#define VELOCITY                ((uint16_t)356)
+#define GPS_X                   ((uint16_t)347)
+#define GPS_Y                   ((uint16_t)353)
+#define VELOCITY                ((uint16_t)359)
 
 
 /************************** EBB ***************************/
 
 /*EBB_BIAS_ID*/
-#define BIAS_POSITION           ((uint16_t)363)
+#define BIAS_POSITION           ((uint16_t)366)
 
 
 /************************** IMU DCU ***************************/
 
-#define DCU_ACC_X               ((uint16_t)369)
-#define DCU_ACC_Y               ((uint16_t)377)
-#define DCU_ACC_Z               ((uint16_t)385)
-#define DCU_GYR_X               ((uint16_t)393)
-#define DCU_GYR_Y               ((uint16_t)401)
-#define DCU_GYR_Z               ((uint16_t)409)
-#define DCU_HEADING             ((uint16_t)417)
+#define DCU_ACC_X               ((uint16_t)372)
+#define DCU_ACC_Y               ((uint16_t)380)
+#define DCU_ACC_Z               ((uint16_t)388)
+#define DCU_GYR_X               ((uint16_t)396)
+#define DCU_GYR_Y               ((uint16_t)404)
+#define DCU_GYR_Z               ((uint16_t)412)
+#define DCU_HEADING             ((uint16_t)420)
 
+/************************** DEBUG *************************/
+
+#define GCU_TEMP             		((uint16_t)424)
+#define FANS_CURRENT         		((uint16_t)428)
+#define H2O_PUMP_CURRENT     		((uint16_t)434)
+#define FUEL_PUMP_CURRENT    		((uint16_t)440)
+#define GEARMOTOR_CURRENT				((uint16_t)446)
+#define CLUTCH_CURRENT       		((uint16_t)452)
+#define DRS_CURRENT          		((uint16_t)458)
+#define DCU_TEMP             		((uint16_t)464)
+#define DCU_CURRENT          		((uint16_t)468)
+#define DAU_FR_TEMP          		((uint16_t)473)
+#define DAU_FR_CURRENT       		((uint16_t)477)
+#define DAU_FL_TEMP          		((uint16_t)482)
+#define DAU_FL_CURRENT       		((uint16_t)486)
+#define DAU_REAR_TEMP        		((uint16_t)491)
+#define DAU_REAR_CURRENT     		((uint16_t)495)
+#define SW_TEMP              		((uint16_t)500)
+//#define EBB_TEMP             		((uint16_t)40)
+//#define EBB_BOARD_CURRENT    		((uint16_t)44)
+//#define EBB_MOTOR_CURRENT    		((uint16_t)49)
 
 /************************** DEBUG *************************/
 
@@ -176,82 +196,9 @@
 
 /******************* SEPARATORS POSITIONS ********************/
 
-#define SEP_EFI_START           ((uint16_t)7)
-#define SEP_EFI_HALL_12         ((uint16_t)13)
-#define SEP_EFI_HALL_23         ((uint16_t)19)
-#define SEP_EFI_HALL_34         ((uint16_t)25)
-#define SEP_EFI_HALL_H20        ((uint16_t)31)
-#define SEP_EFI_H20_12          ((uint16_t)35)
-#define SEP_EFI_H20_23          ((uint16_t)39)
-#define SEP_EFI_H20_34          ((uint16_t)43)
-#define SEP_EFI_H20_OIL         ((uint16_t)47)
-#define SEP_EFI_OIL_12          ((uint16_t)51)
-#define SEP_EFI_OIL_23          ((uint16_t)55)
-#define SEP_EFI_OIL_34          ((uint16_t)59)
-#define SEP_EFI_OIL_GEAR        ((uint16_t)64)
-#define SEP_EFI_GEAR_12         ((uint16_t)66)
-#define SEP_EFI_GEAR_23         ((uint16_t)72)
-#define SEP_EFI_GEAR_34         ((uint16_t)76)
-#define SEP_EFI_GEAR_TRACTION   ((uint16_t)80)
-#define SEP_EFI_TRACTION_12     ((uint16_t)86)
-#define SEP_EFI_TRACTION_23     ((uint16_t)92)
-#define SEP_EFI_TRACTION_34     ((uint16_t)98)
-#define SEP_EFI_TRACTION_FAN    ((uint16_t)100)
-#define SEP_EFI_FAN_12          ((uint16_t)102)
-#define SEP_EFI_FAN_23          ((uint16_t)106)
-#define SEP_EFI_FAN_34          ((uint16_t)108)
-#define SEP_EFI_FAN_LAMBDA      ((uint16_t)114)
-#define SEP_EFI_LAMBDA_12       ((uint16_t)120)
-#define SEP_EFI_LAMBDA_23       ((uint16_t)126)
-#define SEP_EFI_LAMBDA_34       ((uint16_t)129)
-#define SEP_EFI_LAMBDA_DIAG     ((uint16_t)131)
-#define SEP_EFI_DIAG_12         ((uint16_t)133)
-#define SEP_EFI_DIAG_23         ((uint16_t)137)
-#define SEP_EFI_DIAG_34         ((uint16_t)141)
-#define SEP_DAU_START           ((uint16_t)147)
-#define SEP_DAU_FR_12           ((uint16_t)153)
-#define SEP_DAU_FR_23           ((uint16_t)159)
-#define SEP_DAU_FR_FL           ((uint16_t)165)
-#define SEP_DAU_FL_12           ((uint16_t)171)
-#define SEP_DAU_FL_23           ((uint16_t)177)
-#define SEP_DAU_FL_34           ((uint16_t)183)
-#define SEP_DAU_FL_RR           ((uint16_t)189)
-#define SEP_DAU_RR_12           ((uint16_t)195)
-#define SEP_DAU_RR_23           ((uint16_t)201)
-#define SEP_DAU_RR_34           ((uint16_t)207)
-#define SEP_DAU_RR_APPS         ((uint16_t)213)
-#define SEP_DAU_APPS_12         ((uint16_t)219)
-#define SEP_DAU_APPS_IR_FL      ((uint16_t)225)
-#define SEP_DAU_IR_FL_12        ((uint16_t)231)
-#define SEP_DAU_IR_FL_23        ((uint16_t)237)
-#define SEP_DAU_IR_FL_FR        ((uint16_t)243)
-#define SEP_DAU_IR_FR_12        ((uint16_t)249)
-#define SEP_DAU_IR_FR_23        ((uint16_t)255)
-#define SEP_DAU_IR_FR_RL        ((uint16_t)261)
-#define SEP_DAU_IR_RL_12        ((uint16_t)267)
-#define SEP_DAU_IR_RL_23        ((uint16_t)273)
-#define SEP_DAU_IR_RL_RR        ((uint16_t)279)
-#define SEP_DAU_IR_RR_12        ((uint16_t)285)
-#define SEP_DAU_IR_RR_23        ((uint16_t)291)
-#define SEP_IMU_START           ((uint16_t)299)
-#define SEP_IMU_DATA1_12        ((uint16_t)307)
-#define SEP_IMU_DATA1_23        ((uint16_t)315)
-#define SEP_IMU_DATA1_34        ((uint16_t)323)
-#define SEP_IMU_DATA_1_2        ((uint16_t)327)
-#define SEP_IMU_DATA2_12        ((uint16_t)335)
-#define SEP_IMU_DATA2_23        ((uint16_t)343)
-#define SEP_IMU_DATA_2_3        ((uint16_t)349)
-#define SEP_IMU_DATA3_12        ((uint16_t)355)
-#define SEP_IMU_DATA3_23        ((uint16_t)362)
-#define SEP_EBB_START           ((uint16_t)368)
-#define SEP_EBB_IMU_DCU         ((uint16_t)376)
-#define SEP_IMU_DCU_ACC_XY      ((uint16_t)384)
-#define SEP_IMU_DCU_ACC_YZ      ((uint16_t)392)
-#define SEP_IMU_DCU_ACC_GYR     ((uint16_t)400)
-#define SEP_IMU_DCU_GYR_XY      ((uint16_t)408)
-#define SEP_IMU_DCU_GYR_YZ      ((uint16_t)416)
-#define SEP_END_FILE            ((uint16_t)420)
-#define END_LINE_POSITION       ((uint16_t)511)
+#define START_SEPARATOR_POSITION	((uint16_t)7)
+#define END_SEPARATOR_POSITION  	((uint16_t)503)
+#define END_LINE_POSITION       	((uint16_t)511)
 
 #define SEP_DCU_CURRENT         (POSITION_DCU_CURRENT - 1)
 #define SEP_DAU_FR_TEMP         (POSITION_DAU_FR_TEMP - 1)
@@ -308,6 +255,7 @@ extern volatile uint8_t start_Acquisition_Request;
 
 
 extern void initialize_Data(void);
+extern inline void prepareNextBufferBlock(uint8_t previousPointer, uint8_t nextPointer);
 extern inline void makeDataAvg(void);
 extern inline void data_Conversion(uint16_t ID, uint8_t payload[8]);
 extern inline void Imu_Dcu_Conversion_To_Buffer(void);

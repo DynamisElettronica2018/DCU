@@ -48,6 +48,7 @@
 #define STOP_ACQUISITION_AND_TELEMETRY 		((uint8_t)'Z')
 #define SET_RTC_TIME 											((uint8_t)'J')
 #define SET_RTC_DATA 											((uint8_t)'H')
+#define GET_RTC_TIME_DATA 								((uint8_t)'R')
 
 
 #endif	/* TELEMETRY_COMMAND_H */

@@ -2,6 +2,7 @@
 #include "user_ethernet_udp.h"
 #include "telemetry_command.h"
 #include "data.h"
+#include "rtc.h"
 
 
 static uint8_t telemetry_Is_Alive_First = 1;
@@ -120,12 +121,18 @@ static inline void dcu_Board_Command(char *command)
       }
       
       break;
-        
-    /*case SET_RTC_TIME: 
+		
+		case SET_RTC_TIME: 
+			set_Rtc_Time((uint8_t)command[2], (uint8_t)command[3], (uint8_t)0);
       break;
     
     case SET_RTC_DATA:
-      break;*/
+			set_Rtc_Date((uint8_t)command[2], (uint8_t)command[3], (uint8_t)command[4], (uint8_t)command[5]);
+      break;
+		
+		case GET_RTC_TIME_DATA:
+			UDP_Send_DateTime();
+      break;
   }
   
   UDP_Send_Queue(UDP_DCU_STATE_PORT, dcu_State_Packet, BUFFER_STATE_LEN);

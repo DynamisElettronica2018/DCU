@@ -57,81 +57,99 @@ extern void initialize_Data(void)
 			block_Buffer[i][j] = '0';
 		}
 		
-		block_Buffer[i][SEP_EFI_START] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_HALL_12] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_HALL_23] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_HALL_34] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_HALL_H20] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_H20_12] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_H20_23] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_H20_34] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_H20_OIL] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_OIL_12] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_OIL_23] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_OIL_34] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_OIL_GEAR] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_GEAR_12] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_GEAR_23] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_GEAR_34] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_GEAR_TRACTION] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_TRACTION_12] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_TRACTION_23] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_TRACTION_34] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_TRACTION_FAN] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_FAN_12] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_FAN_23] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_FAN_34] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_FAN_LAMBDA] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_LAMBDA_12] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_LAMBDA_23] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_LAMBDA_34] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_LAMBDA_DIAG] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_DIAG_12] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_DIAG_23] = SEPARATOR;
-		block_Buffer[i][SEP_EFI_DIAG_34] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_START] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_FR_12] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_FR_23] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_FR_FL] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_FL_12] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_FL_23] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_FL_34] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_FL_RR] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_RR_12] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_RR_23] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_RR_34] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_RR_APPS] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_APPS_12] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_APPS_IR_FL] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_FL_12] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_FL_23] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_FL_FR] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_FR_12] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_FR_23] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_FR_RL] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_RL_12] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_RL_23] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_RL_RR] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_RR_12] = SEPARATOR;
-		block_Buffer[i][SEP_DAU_IR_RR_23] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_START] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA1_12] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA1_23] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA1_34] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA_1_2] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA2_12] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA2_23] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA_2_3] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA3_12] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DATA3_23] = SEPARATOR;
-		block_Buffer[i][SEP_EBB_START] = SEPARATOR;
-		block_Buffer[i][SEP_EBB_IMU_DCU] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DCU_ACC_XY] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DCU_ACC_YZ] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DCU_ACC_GYR] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DCU_GYR_XY] = SEPARATOR;
-		block_Buffer[i][SEP_IMU_DCU_GYR_YZ] = SEPARATOR;
-		block_Buffer[i][SEP_END_FILE] = SEPARATOR;
+		block_Buffer[i][START_SEPARATOR_POSITION] = SEPARATOR;
+		block_Buffer[i][HALL_EFFECT_FR - 1] = SEPARATOR;
+		block_Buffer[i][HALL_EFFECT_FL - 1] = SEPARATOR;
+		block_Buffer[i][HALL_EFFECT_RR - 1] = SEPARATOR;
+		block_Buffer[i][HALL_EFFECT_RL - 1] = SEPARATOR;
+		block_Buffer[i][T_H20_SX_IN - 1] = SEPARATOR;
+		block_Buffer[i][T_H20_SX_OUT - 1] = SEPARATOR;
+		block_Buffer[i][T_H20_DX_IN - 1] = SEPARATOR;
+		block_Buffer[i][T_H20_DX_OUT - 1] = SEPARATOR;
+		block_Buffer[i][T_OIL_IN - 1] = SEPARATOR;
+		block_Buffer[i][T_OIL_OUT - 1] = SEPARATOR;
+		block_Buffer[i][T_H20_ENGINE - 1] = SEPARATOR;
+		block_Buffer[i][BATTERY_VOLTAGE - 1] = SEPARATOR;
+		block_Buffer[i][GEAR - 1] = SEPARATOR;
+		block_Buffer[i][RPM - 1] = SEPARATOR;
+		block_Buffer[i][TPS_1 - 1] = SEPARATOR;
+		block_Buffer[i][PEDAL_POSITION_AVG - 1] = SEPARATOR;
+		block_Buffer[i][VH_SPEED - 1] = SEPARATOR;
+		block_Buffer[i][SLIP_TARGET - 1] = SEPARATOR;
+		block_Buffer[i][SLIP - 1] = SEPARATOR;
+		block_Buffer[i][FUEL_PUMP - 1] = SEPARATOR;
+		block_Buffer[i][FAN - 1] = SEPARATOR;
+		block_Buffer[i][H20_PUMP_DUTY_CYCLE - 1] = SEPARATOR;
+		block_Buffer[i][LAUNCH_CONTROL_ACTIVE - 1] = SEPARATOR;
+		block_Buffer[i][FUEL_PRESSURE - 1] = SEPARATOR;
+		block_Buffer[i][OIL_PRESSURE - 1] = SEPARATOR;
+		block_Buffer[i][LAMBDA - 1] = SEPARATOR;
+		block_Buffer[i][FLAG_SMOT - 1] = SEPARATOR;
+		block_Buffer[i][DIAG_IGN_1 - 1] = SEPARATOR;
+		block_Buffer[i][DIAG_IGN_2 - 1] = SEPARATOR;
+		block_Buffer[i][T_SCARICO_1 - 1] = SEPARATOR;
+		block_Buffer[i][T_SCARICO_2 - 1] = SEPARATOR;
+		block_Buffer[i][LINEARE_FR - 1] = SEPARATOR;
+		block_Buffer[i][LOAD_CELL_FR - 1] = SEPARATOR;
+		block_Buffer[i][BPS_FRONT - 1] = SEPARATOR;
+		block_Buffer[i][LINEARE_FL - 1] = SEPARATOR;
+		block_Buffer[i][LOAD_CELL_FL - 1] = SEPARATOR;
+		block_Buffer[i][BPS_REAR - 1] = SEPARATOR;
+		block_Buffer[i][STEERING_WHEEL_ANGLE - 1] = SEPARATOR;
+		block_Buffer[i][LINEARE_RL - 1] = SEPARATOR;
+		block_Buffer[i][LOAD_CELL_RL - 1] = SEPARATOR;
+		block_Buffer[i][LINEARE_RR - 1] = SEPARATOR;
+		block_Buffer[i][LOAD_CELL_RR - 1] = SEPARATOR;
+		block_Buffer[i][APPS1 - 1] = SEPARATOR;
+		block_Buffer[i][APPS2 - 1] = SEPARATOR;
+		block_Buffer[i][IR1_FL - 1] = SEPARATOR;
+		block_Buffer[i][IR2_FL - 1] = SEPARATOR;
+		block_Buffer[i][IR3_FL - 1] = SEPARATOR;
+		block_Buffer[i][IR1_FR - 1] = SEPARATOR;
+		block_Buffer[i][IR2_FR - 1] = SEPARATOR;
+		block_Buffer[i][IR3_FR - 1] = SEPARATOR;
+		block_Buffer[i][IR1_RL - 1] = SEPARATOR;
+		block_Buffer[i][IR2_RL - 1] = SEPARATOR;
+		block_Buffer[i][IR3_RL - 1] = SEPARATOR;
+		block_Buffer[i][IR1_RR - 1] = SEPARATOR;
+		block_Buffer[i][IR2_RR - 1] = SEPARATOR;
+		block_Buffer[i][IR3_RR - 1] = SEPARATOR;
+		block_Buffer[i][ACC_X - 1] = SEPARATOR;
+		block_Buffer[i][ACC_Y - 1] = SEPARATOR;
+		block_Buffer[i][GYR_X - 1] = SEPARATOR;
+		block_Buffer[i][GYR_Z - 1] = SEPARATOR;
+		block_Buffer[i][HEADING - 1] = SEPARATOR;
+		block_Buffer[i][ACC_Z - 1] = SEPARATOR;
+		block_Buffer[i][GYR_Y - 1] = SEPARATOR;
+		block_Buffer[i][GPS_X - 1] = SEPARATOR;
+		block_Buffer[i][GPS_Y - 1] = SEPARATOR;
+		block_Buffer[i][VELOCITY - 1] = SEPARATOR;
+		block_Buffer[i][BIAS_POSITION - 1] = SEPARATOR;
+		block_Buffer[i][DCU_ACC_X - 1] = SEPARATOR;
+		block_Buffer[i][DCU_ACC_Y - 1] = SEPARATOR;
+		block_Buffer[i][DCU_ACC_Z - 1] = SEPARATOR;
+		block_Buffer[i][DCU_GYR_X - 1] = SEPARATOR;
+		block_Buffer[i][DCU_GYR_Y - 1] = SEPARATOR;
+		block_Buffer[i][DCU_GYR_Z - 1] = SEPARATOR;
+		block_Buffer[i][DCU_HEADING - 1] = SEPARATOR;
+		block_Buffer[i][GCU_TEMP - 1] = SEPARATOR;
+		block_Buffer[i][FANS_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][H2O_PUMP_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][FUEL_PUMP_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][GEARMOTOR_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][CLUTCH_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][DRS_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][DCU_TEMP - 1] = SEPARATOR;
+		block_Buffer[i][DCU_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][DAU_FR_TEMP - 1] = SEPARATOR;
+		block_Buffer[i][DAU_FR_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][DAU_FL_TEMP - 1] = SEPARATOR;
+		block_Buffer[i][DAU_FL_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][DAU_REAR_TEMP - 1] = SEPARATOR;
+		block_Buffer[i][DAU_REAR_CURRENT - 1] = SEPARATOR;
+		block_Buffer[i][SW_TEMP - 1] = SEPARATOR;
+		
+		block_Buffer[i][END_SEPARATOR_POSITION] = SEPARATOR;		
 		block_Buffer[i][END_LINE_POSITION] = END_LINE;
 	}
 	
@@ -174,68 +192,85 @@ extern void initialize_Data(void)
 
 
 
+
+extern inline void prepareNextBufferBlock(uint8_t previousPointer, uint8_t nextPointer)
+{
+	for(int i = 0; i < BUFFER_BLOCK_LEN; i++)
+	{
+		block_Buffer[nextPointer][i] = block_Buffer[previousPointer][i];
+	}
+}
+
 extern inline void makeDataAvg(void)
 {
+	for(uint8_t j = 0; j < 21; j++)
+	{
+		avg_Buffer[j][10] = 0;
+	}
+	
 	for(uint8_t j = 0; j < 10; j++)
 	{
-		avg_Buffer[AVGBUF_WHEELSPEED1][10] += avg_Buffer[AVGBUF_WHEELSPEED1][j];
-		avg_Buffer[AVGBUF_WHEELSPEED2][10] += avg_Buffer[AVGBUF_WHEELSPEED2][j];
-		avg_Buffer[AVGBUF_WHEELSPEED3][10] += avg_Buffer[AVGBUF_WHEELSPEED3][j];
-		avg_Buffer[AVGBUF_WHEELSPEED4][10] += avg_Buffer[AVGBUF_WHEELSPEED4][j];
+		avg_Buffer[AVGBUF_WHEELSPEED1][10] = avg_Buffer[AVGBUF_WHEELSPEED1][10] + avg_Buffer[AVGBUF_WHEELSPEED1][j];
+		avg_Buffer[AVGBUF_WHEELSPEED2][10] = avg_Buffer[AVGBUF_WHEELSPEED2][10] + avg_Buffer[AVGBUF_WHEELSPEED2][j];
+		avg_Buffer[AVGBUF_WHEELSPEED3][10] = avg_Buffer[AVGBUF_WHEELSPEED3][10] + avg_Buffer[AVGBUF_WHEELSPEED3][j];
+		avg_Buffer[AVGBUF_WHEELSPEED4][10] = avg_Buffer[AVGBUF_WHEELSPEED4][10] + avg_Buffer[AVGBUF_WHEELSPEED4][j];
 		
-		avg_Buffer[AVGBUF_BRAKEPRESSF][10] += avg_Buffer[AVGBUF_BRAKEPRESSF][j];
-		avg_Buffer[AVGBUF_BRAKEPRESSR][10] += avg_Buffer[AVGBUF_BRAKEPRESSR][j];
+		avg_Buffer[AVGBUF_BRAKEPRESSF][10] = avg_Buffer[AVGBUF_BRAKEPRESSF][10] + avg_Buffer[AVGBUF_BRAKEPRESSF][j];
+		avg_Buffer[AVGBUF_BRAKEPRESSR][10] = avg_Buffer[AVGBUF_BRAKEPRESSR][10] + avg_Buffer[AVGBUF_BRAKEPRESSR][j];
 		
-		avg_Buffer[AVGBUF_TPS][10] += avg_Buffer[AVGBUF_TPS][j];
-		avg_Buffer[AVGBUF_SW][10] += avg_Buffer[AVGBUF_SW][j];
+		avg_Buffer[AVGBUF_TPS][10] = avg_Buffer[AVGBUF_TPS][10] + avg_Buffer[AVGBUF_TPS][j];
+		avg_Buffer[AVGBUF_SW][10] = avg_Buffer[AVGBUF_SW][10] + avg_Buffer[AVGBUF_SW][j];
 		
-		avg_Buffer[AVGBUF_ACCX][10] += avg_Buffer[AVGBUF_ACCX][j];
-		avg_Buffer[AVGBUF_ACCY][10] += avg_Buffer[AVGBUF_ACCY][j];
-		avg_Buffer[AVGBUF_ACCZ][10] += avg_Buffer[AVGBUF_ACCZ][j];
-		avg_Buffer[AVGBUF_GYROZ][10] += avg_Buffer[AVGBUF_GYROZ][j];
+		avg_Buffer[AVGBUF_ACCX][10] = avg_Buffer[AVGBUF_ACCX][10] + avg_Buffer[AVGBUF_ACCX][j];
+		avg_Buffer[AVGBUF_ACCY][10] = avg_Buffer[AVGBUF_ACCY][10] + avg_Buffer[AVGBUF_ACCY][j];
+		avg_Buffer[AVGBUF_ACCZ][10] = avg_Buffer[AVGBUF_ACCZ][10] + avg_Buffer[AVGBUF_ACCZ][j];
+		avg_Buffer[AVGBUF_GYROZ][10] = avg_Buffer[AVGBUF_GYROZ][10] + avg_Buffer[AVGBUF_GYROZ][j];
 		
-		avg_Buffer[AVGBUF_DCU_ACCX][10] += avg_Buffer[AVGBUF_DCU_ACCX][j];
-		avg_Buffer[AVGBUF_DCU_ACCY][10] += avg_Buffer[AVGBUF_DCU_ACCY][j];
-		avg_Buffer[AVGBUF_DCU_ACCZ][10] += avg_Buffer[AVGBUF_DCU_ACCZ][j];
-		avg_Buffer[AVGBUF_DCU_GYROZ][10] += avg_Buffer[AVGBUF_DCU_GYROZ][j];
+		avg_Buffer[AVGBUF_DCU_ACCX][10] = avg_Buffer[AVGBUF_DCU_ACCX][10] + avg_Buffer[AVGBUF_DCU_ACCX][j];
+		avg_Buffer[AVGBUF_DCU_ACCY][10] = avg_Buffer[AVGBUF_DCU_ACCY][10] + avg_Buffer[AVGBUF_DCU_ACCY][j];
+		avg_Buffer[AVGBUF_DCU_ACCZ][10] = avg_Buffer[AVGBUF_DCU_ACCZ][10] + avg_Buffer[AVGBUF_DCU_ACCZ][j];
+		avg_Buffer[AVGBUF_DCU_GYROZ][10] = avg_Buffer[AVGBUF_DCU_GYROZ][10] + avg_Buffer[AVGBUF_DCU_GYROZ][j];
 		
-		avg_Buffer[AVGBUF_VHSPEED][10] += avg_Buffer[AVGBUF_VHSPEED][j];
+		avg_Buffer[AVGBUF_VHSPEED][10] = avg_Buffer[AVGBUF_VHSPEED][10] + avg_Buffer[AVGBUF_VHSPEED][j];
 		
-		avg_Buffer[AVGBUF_LINEARFL][10] += avg_Buffer[AVGBUF_LINEARFL][j];
-		avg_Buffer[AVGBUF_LINEARFR][10] += avg_Buffer[AVGBUF_LINEARFR][j];
-		avg_Buffer[AVGBUF_LINEARRR][10] += avg_Buffer[AVGBUF_LINEARRR][j];
-		avg_Buffer[AVGBUF_LINEARRL][10] += avg_Buffer[AVGBUF_LINEARRL][j];
+		avg_Buffer[AVGBUF_LINEARFL][10] = avg_Buffer[AVGBUF_LINEARFL][10] + avg_Buffer[AVGBUF_LINEARFL][j];
+		avg_Buffer[AVGBUF_LINEARFR][10] = avg_Buffer[AVGBUF_LINEARFR][10] + avg_Buffer[AVGBUF_LINEARFR][j];
+		avg_Buffer[AVGBUF_LINEARRR][10] = avg_Buffer[AVGBUF_LINEARRR][10] + avg_Buffer[AVGBUF_LINEARRR][j];
+		avg_Buffer[AVGBUF_LINEARRL][10] = avg_Buffer[AVGBUF_LINEARRL][10] + avg_Buffer[AVGBUF_LINEARRL][j];
 	}
 	
 	buffer_telemetryPointer = (buffer_telemetryPointer + BUFFER_LEN - 1) % BUFFER_LEN;
 	
-	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_WHEELSPEED1][10] / 10.0), &block_Buffer[buffer_telemetryPointer][HALL_EFFECT_FR], 3, 1);
-	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_WHEELSPEED2][10] / 10.0), &block_Buffer[buffer_telemetryPointer][HALL_EFFECT_FL], 3, 1);
-	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_WHEELSPEED3][10] / 10.0), &block_Buffer[buffer_telemetryPointer][HALL_EFFECT_RR], 3, 1);
-	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_WHEELSPEED4][10] / 10.0), &block_Buffer[buffer_telemetryPointer][HALL_EFFECT_RL], 3, 1);
+	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_WHEELSPEED1][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][HALL_EFFECT_FR], 3, 1);
+	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_WHEELSPEED2][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][HALL_EFFECT_FL], 3, 1);
+	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_WHEELSPEED3][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][HALL_EFFECT_RR], 3, 1);
+	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_WHEELSPEED4][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][HALL_EFFECT_RL], 3, 1);
 	
-	int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_BRAKEPRESSF][10] / 10.0), &block_Buffer[buffer_telemetryPointer][BPS_FRONT], 5);
-	int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_BRAKEPRESSR][10] / 10.0), &block_Buffer[buffer_telemetryPointer][BPS_FRONT], 5);
+	int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_BRAKEPRESSF][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][BPS_FRONT], 5);
+	int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_BRAKEPRESSR][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][BPS_FRONT], 5);
 	
-	int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_TPS][10] / 10.0), &block_Buffer[buffer_telemetryPointer][TPS_1], 3);
-	int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_SW][10] / 10.0), &block_Buffer[buffer_telemetryPointer][STEERING_WHEEL_ANGLE], 5);
+	int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_TPS][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][TPS_1], 3);
+	int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_SW][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][STEERING_WHEEL_ANGLE], 5);
 	
-	decimal_To_String((int16_t)(avg_Buffer[AVGBUF_ACCX][10] / 10.0), &block_Buffer[buffer_telemetryPointer][ACC_X], 3, 2);
-	decimal_To_String((int16_t)(avg_Buffer[AVGBUF_ACCY][10] / 10.0), &block_Buffer[buffer_telemetryPointer][ACC_Y], 3, 2);
-	decimal_To_String((int16_t)(avg_Buffer[AVGBUF_ACCZ][10] / 10.0), &block_Buffer[buffer_telemetryPointer][ACC_Z], 3, 2);
-	decimal_To_String((int16_t)(avg_Buffer[AVGBUF_GYROZ][10] / 10.0), &block_Buffer[buffer_telemetryPointer][GYR_Z], 3, 2);
+	decimal_To_String((int16_t)(avg_Buffer[AVGBUF_ACCX][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][ACC_X], 3, 2);
+	decimal_To_String((int16_t)(avg_Buffer[AVGBUF_ACCY][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][ACC_Y], 3, 2);
+	decimal_To_String((int16_t)(avg_Buffer[AVGBUF_ACCZ][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][ACC_Z], 3, 2);
+	decimal_To_String((int16_t)(avg_Buffer[AVGBUF_GYROZ][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][GYR_Z], 3, 2);
 	
-  decimal_To_String((int16_t)(avg_Buffer[AVGBUF_DCU_ACCX][10] / 10.0), &block_Buffer[buffer_telemetryPointer][DCU_ACC_X], 3, 2);
-  decimal_To_String((int16_t)(avg_Buffer[AVGBUF_DCU_ACCY][10] / 10.0), &block_Buffer[buffer_telemetryPointer][DCU_ACC_Y], 3, 2);
-  decimal_To_String((int16_t)(avg_Buffer[AVGBUF_DCU_ACCZ][10] / 10.0), &block_Buffer[buffer_telemetryPointer][DCU_ACC_Z], 3, 2);
-  decimal_To_String((int16_t)(avg_Buffer[AVGBUF_DCU_GYROZ][10] / 10.0), &block_Buffer[buffer_telemetryPointer][DCU_GYR_Z], 3, 2);
+	if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_ERROR)//Don't make tha average if saving is not on because the sample rate is 10Hz in this case
+	{
+		decimal_To_String((int16_t)(avg_Buffer[AVGBUF_DCU_ACCX][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][DCU_ACC_X], 3, 2);
+		decimal_To_String((int16_t)(avg_Buffer[AVGBUF_DCU_ACCY][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][DCU_ACC_Y], 3, 2);
+		decimal_To_String((int16_t)(avg_Buffer[AVGBUF_DCU_ACCZ][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][DCU_ACC_Z], 3, 2);
+		decimal_To_String((int16_t)(avg_Buffer[AVGBUF_DCU_GYROZ][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][DCU_GYR_Z], 3, 2);
+	}
+		
+	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_VHSPEED][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][VH_SPEED], 3, 1);
 	
-	decimal_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_VHSPEED][10] / 10.0), &block_Buffer[buffer_telemetryPointer][VH_SPEED], 3, 1);
-	
-  int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_LINEARFL][10] / 10.0), &block_Buffer[buffer_telemetryPointer][LINEARE_FL], 5);
-  int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_LINEARFR][10] / 10.0), &block_Buffer[buffer_telemetryPointer][LINEARE_FR], 5);
-  int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_LINEARRL][10] / 10.0), &block_Buffer[buffer_telemetryPointer][LINEARE_RL], 5);
-  int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_LINEARRR][10] / 10.0), &block_Buffer[buffer_telemetryPointer][LINEARE_RR], 5);	
+  int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_LINEARFL][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][LINEARE_FL], 5);
+  int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_LINEARFR][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][LINEARE_FR], 5);
+  int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_LINEARRL][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][LINEARE_RL], 5);
+  int_To_String_Unsigned((uint16_t)(avg_Buffer[AVGBUF_LINEARRR][10] / 10.0f), &block_Buffer[buffer_telemetryPointer][LINEARE_RR], 5);	
 }
 
 // Funzione di conversione dati, identificati in base all'ID del relativo pacchetto CAN
@@ -379,7 +414,8 @@ extern inline void data_Conversion(uint16_t ID, uint8_t payload[8])
       
       // SLIP byte 4-5
       uTemp = ((data4 << 8 ) & 0xFF00) | data5;
-      decimal_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][SLIP], 3, 1);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][SLIP], 5);
+      //decimal_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][SLIP], 3, 1);
       break;
         
     case EFI_FUEL_FAN_H2O_LAUNCH_ID:
@@ -394,8 +430,8 @@ extern inline void data_Conversion(uint16_t ID, uint8_t payload[8])
       
       // H20_PUMP_DUTY_CYCLE byte 4-5
       uTemp = ((data4 << 8 ) & 0xFF00) | data5;
-      uTemp = uTemp * 100;
-      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][H20_PUMP_DUTY_CYCLE], 3);
+      fTemp = ((float)uTemp / 255.0f) * 100.0f;
+      int_To_String_Unsigned((uint16_t)fTemp, &block_Buffer[buffer_writePointer][H20_PUMP_DUTY_CYCLE], 3);
       
       // LAUNCH_CONTROL_ACTIVE byte 6-7
       uTemp = ((data6 << 8 ) & 0xFF00) | data7;
@@ -418,7 +454,7 @@ extern inline void data_Conversion(uint16_t ID, uint8_t payload[8])
       
       // FLAG_SMOT byte 6-7
       uTemp = ((data6 << 8 ) & 0xFF00) | data7;
-      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][FLAG_SMOT], 2);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][FLAG_SMOT], 5);
       break;
     
     case EFI_DIAG_IGN_EXHAUST_ID:
@@ -695,13 +731,13 @@ extern inline void Imu_Dcu_Conversion_To_Buffer(void)
   decimal_To_String((int16_t)raw_Data.accelerometer[0], &block_Buffer[buffer_writePointer][DCU_ACC_X], 3, 2);
 	
 	//ACC Y
-	avg_Buffer[AVGBUF_DCU_ACCY][avg_Buffer_Pointers[AVGBUF_DCU_ACCY]] = (float)raw_Data.accelerometer[0];
+	avg_Buffer[AVGBUF_DCU_ACCY][avg_Buffer_Pointers[AVGBUF_DCU_ACCY]] = (float)raw_Data.accelerometer[1];
 	avg_Buffer_Pointers[AVGBUF_DCU_ACCY] = (avg_Buffer_Pointers[AVGBUF_DCU_ACCY] + 1) % 10;
 			
 	decimal_To_String((int16_t)raw_Data.accelerometer[1], &block_Buffer[buffer_writePointer][DCU_ACC_Y], 3, 2);
 	
 	//ACC Z
-	avg_Buffer[AVGBUF_DCU_ACCZ][avg_Buffer_Pointers[AVGBUF_DCU_ACCZ]] = (float)raw_Data.accelerometer[0];
+	avg_Buffer[AVGBUF_DCU_ACCZ][avg_Buffer_Pointers[AVGBUF_DCU_ACCZ]] = (float)raw_Data.accelerometer[2];
 	avg_Buffer_Pointers[AVGBUF_DCU_ACCZ] = (avg_Buffer_Pointers[AVGBUF_DCU_ACCZ] + 1) % 10;
 			
 	decimal_To_String((int16_t)raw_Data.accelerometer[2], &block_Buffer[buffer_writePointer][DCU_ACC_Z], 3, 2);
@@ -746,10 +782,12 @@ extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8])
       // DAU_FR_TEMP byte 0-1
       uTemp = ((data0 << 8 ) & 0xFF00) | data1;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_FR_TEMP], 3);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][DAU_FR_TEMP], 3);
       
       // DAU_FR_CURRENT byte 2-3
       uTemp = ((data2 << 8 ) & 0xFF00) | data3;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_FR_CURRENT], 4);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][DAU_FR_CURRENT], 4);
       break;
     
     case DAU_FL_DEBUG_ID:
@@ -757,10 +795,12 @@ extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8])
       // DAU_FL_TEMP byte 0-1
       uTemp = ((data0 << 8 ) & 0xFF00) | data1;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_FL_TEMP], 3);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][DAU_FL_TEMP], 3);
       
       // DAU_FL_CURRENT byte 2-3
       uTemp = ((data2 << 8 ) & 0xFF00) | data3;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_FL_CURRENT], 4);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][DAU_FL_CURRENT], 4);
       break;
         
     case DAU_REAR_DEBUG_ID:
@@ -768,10 +808,12 @@ extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8])
       // DAU_REAR_TEMP byte 0-1
       uTemp = ((data0 << 8 ) & 0xFF00) | data1;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_REAR_TEMP], 3);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][DAU_REAR_TEMP], 3);
       
       // DAU_REAR_CURRENT byte 2-3
       uTemp = ((data2 << 8 ) & 0xFF00) | data3;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DAU_REAR_CURRENT], 4);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][DAU_REAR_CURRENT], 4);
       break;
     
     case SW_DEBUG_ID:
@@ -779,6 +821,7 @@ extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8])
       // SW_TEMP byte 0-1
       uTemp = ((data0 << 8 ) & 0xFF00) | data1;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_SW_TEMP], 3);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][SW_TEMP], 3);
       break;
     
     case EBB_DEBUG_ID:
@@ -786,14 +829,17 @@ extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8])
       // EBB_TEMP byte 0-1
       uTemp = ((data0 << 8 ) & 0xFF00) | data1;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_EBB_TEMP], 3);
+      //int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][EBB_TEMP], 3);
       
       // EBB_BOARD_CURRENT byte 2-3
       uTemp = ((data2 << 8 ) & 0xFF00) | data3;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_EBB_BOARD_CURRENT], 4);
+      //int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][EBB_BOARD_CURRENT], 4);
       
       // EBB_MOTOR_CURRENT byte 4-5
       uTemp = ((data4 << 8 ) & 0xFF00) | data5;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_EBB_MOTOR_CURRENT], 4);
+      //int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][EBB_MOTOR_CURRENT], 4);
       break;
     
     case GCU_DEBUG_1_ID:
@@ -801,18 +847,22 @@ extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8])
       // GCU_TEMP byte 0-1
       uTemp = ((data0 << 8 ) & 0xFF00) | data1;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_GCU_TEMP], 3);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][GCU_TEMP], 3);
       
       // FANS_CURRENT byte 2-3
       uTemp = ((data2 << 8 ) & 0xFF00) | data3;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_FANS_CURRENT], 5);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][FANS_CURRENT], 5);
       
       // H2O_PUMP_CURRENT byte 4-5
       uTemp = ((data4 << 8 ) & 0xFF00) | data5;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_H2O_PUMP_CURRENT], 5);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][H2O_PUMP_CURRENT], 5);
       
       // FUEL_PUMP_CURRENT byte 6-7
       uTemp = ((data6 << 8 ) & 0xFF00) | data7;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_FUEL_PUMP_CURRENT], 5);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][FUEL_PUMP_CURRENT], 5);
       break;
     
     case GCU_DEBUG_2_ID:
@@ -820,14 +870,17 @@ extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8])
       // GEARMOTOR_CURRENT byte 0-1
       uTemp = ((data0 << 8 ) & 0xFF00) | data1;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_GEARMOTOR_CURRENT], 5);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][GEARMOTOR_CURRENT], 5);
       
       // CLUTCH_CURRENT byte 2-3
       uTemp = ((data2 << 8 ) & 0xFF00) | data3;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_CLUTCH_CURRENT], 5);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][CLUTCH_CURRENT], 5);
       
       // DRS_CURRENT byte 4-5
       uTemp = ((data4 << 8 ) & 0xFF00) | data5;
       int_To_String_Unsigned((uint16_t)uTemp, &dcu_Debug_Packet[POSITION_DRS_CURRENT], 5);
+      int_To_String_Unsigned((uint16_t)uTemp, &block_Buffer[buffer_writePointer][DRS_CURRENT], 5);
       break;
   }
 }

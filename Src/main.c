@@ -150,13 +150,13 @@ int main(void)
   CAN1_Start();
   UDP_Init();
   //SD_Check_And_Init();
+	//set_Rtc_Time((uint8_t)18, (uint8_t)45, (uint8_t)0);
   initialize_Data();
   BNO055_Init();
   dcu_Debug_Get_Data();
   HAL_Delay(250);
   HAL_TIM_Base_Start_IT(&htim5);
   HAL_TIM_Base_Start_IT(&htim6);
-//  HAL_TIM_Base_Start_IT(&htim7);
   
   /* USER CODE END 2 */
 
@@ -167,15 +167,28 @@ int main(void)
     if(start_Acquisition_Request == START_ACQUISITION_REQUEST)
     {
       start_Acquisition_Request = START_ACQUISITION_DONE;
-      USB_Open_File();
-			HAL_TIM_Base_Start_IT(&htim7);
+			if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_ERROR)
+			{
+				USB_Open_File();
+				
+				if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_OK)
+				{
+						HAL_TIM_Base_Start_IT(&htim7);
+						CAN_Send_Dcu_Is_Alive_Packet();
+				}
+			}
     }
     
     else if(start_Acquisition_Request == STOP_ACQUISITION_REQUEST)
     {
       start_Acquisition_Request = START_ACQUISITION_DONE;
-      USB_Close_File();   
-			HAL_TIM_Base_Stop_IT(&htim7);
+			
+			if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_OK)
+			{
+				USB_Close_File();   
+				HAL_TIM_Base_Stop_IT(&htim7);
+				CAN_Send_Dcu_IsNot_Alive_Packet();
+			}
     }
     
   /* USER CODE END WHILE */
@@ -287,11 +300,6 @@ extern inline void TIM6_IRQ_User_Handler(void)
 		UDP_Send_Queue(UDP_DCU_STATE_PORT, dcu_State_Packet, BUFFER_STATE_LEN);
     UDP_Send_Queue(UDP_TELEMETRY_DEBUG_PORT, dcu_Debug_Packet, BUFFER_DEBUG_LEN);
 	}
-  
-	if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_OK)
-  {
-    CAN_Send_Dcu_Is_Alive_Packet();
-  }
 }
 
 
@@ -308,7 +316,9 @@ extern inline void TIM5_IRQ_User_Handler(void)
 			Imu_Dcu_Conversion_To_Buffer();
 		}
 		
-		makeDataAvg();
+		//makeDataAvg();
+		
+		buffer_telemetryPointer = (buffer_telemetryPointer + BUFFER_LEN - 1) % BUFFER_LEN;
 		
 		UDP_Send_Queue(UDP_TELEMETRY_DATA_PORT, block_Buffer[buffer_telemetryPointer], BUFFER_BLOCK_LEN);
 	}
@@ -328,7 +338,15 @@ extern inline void TIM7_IRQ_User_Handler(void)
 	
   USB_Write_Block(block_Buffer[buffer_readPointer]);
 	
+	//Copy the last saved block to the next one, to garantee the sequence of the data with low sample rate
+	prepareNextBufferBlock(buffer_readPointer, buffer_writePointer);
+	
 	buffer_readPointer = (buffer_readPointer + 1) % BUFFER_LEN;
+	
+	if(USB_Timestamp % CLOSE_FILE_INTERVAL == 0)
+	{
+		USB_CloseOpen_File();
+	}
 }
 
 

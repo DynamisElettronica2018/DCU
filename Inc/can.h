@@ -65,8 +65,8 @@ extern CAN_HandleTypeDef hcan1;
 
 /* USER CODE BEGIN Private defines */
    
-volatile extern uint32_t packet_Fifo0_Counter;
-volatile extern uint32_t packet_Fifo1_Counter;
+//volatile extern uint32_t packet_Fifo0_Counter;
+//volatile extern uint32_t packet_Fifo1_Counter;
 
 /* USER CODE END Private defines */
 
@@ -78,6 +78,7 @@ void MX_CAN1_Init(void);
 
 extern void CAN1_Start(void);
 extern inline void CAN_Send_Dcu_Is_Alive_Packet(void);
+extern inline void CAN_Send_Dcu_IsNot_Alive_Packet(void);
 extern inline void CAN_Send_Dcu_Debug_Pakcet(void);
 static void CAN1_Filter_Setup(void);
 

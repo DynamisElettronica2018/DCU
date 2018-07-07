@@ -79,9 +79,9 @@ extern inline void decimal_To_String_Unsigned(uint16_t i, uint8_t *s, uint8_t nu
   {
     integer = i / power(10, nun_Dec);
     decimal = i % power(10, nun_Dec);
-    int_To_String((int16_t)integer, &s[0], num_Int);
+    int_To_String_Unsigned((int16_t)integer, &s[0], num_Int);
     s[num_Int] = DECIMAL_SEPARATOR;
-    int_To_String((int16_t)decimal, &s[num_Int+1], nun_Dec);
+    int_To_String_Unsigned((int16_t)decimal, &s[num_Int+1], nun_Dec);
   }
 }
 

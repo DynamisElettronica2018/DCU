@@ -76,3 +76,4 @@ dcu_dpx\command_processing.o: ../Inc/user_defines.h
 dcu_dpx\command_processing.o: ../Inc/telemetry_command.h
 dcu_dpx\command_processing.o: ../Inc/data.h
 dcu_dpx\command_processing.o: ../Inc/bno055.h
+dcu_dpx\command_processing.o: ../Inc/rtc.h

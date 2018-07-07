@@ -87,7 +87,7 @@ void MX_RTC_Init(void)
 
     /**Initialize RTC and set the Time and Date 
     */
-  sTime.Hours = 0x12;
+  /*sTime.Hours = 0x12;
   sTime.Minutes = 0x0;
   sTime.Seconds = 0x0;
   sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
@@ -95,7 +95,7 @@ void MX_RTC_Init(void)
   if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
-  }
+  }*/
   /* USER CODE BEGIN RTC_Init 3 */
 
   /* USER CODE END RTC_Init 3 */
@@ -176,6 +176,8 @@ extern void set_Rtc_Time(uint8_t hours, uint8_t minutes, uint8_t seconds)
   set_Time.Hours = hours;
   set_Time.Minutes = minutes;
   set_Time.Seconds = seconds;
+  set_Time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  set_Time.StoreOperation = RTC_STOREOPERATION_RESET;
   HAL_RTC_SetTime(&hrtc, &set_Time, RTC_FORMAT_BIN);
 }
 

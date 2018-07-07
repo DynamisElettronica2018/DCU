@@ -6,6 +6,7 @@
 
 extern inline void USB_Open_File(void);
 extern inline void USB_Close_File(void);
+extern inline void USB_CloseOpen_File(void);
 extern inline void USB_Write_Block(uint8_t *buffer);
 extern inline void USB_Write_Len(uint8_t *buffer);
 static inline void USB_Get_File_Name(char *filename);

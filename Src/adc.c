@@ -202,7 +202,10 @@ extern inline void dcu_Debug_Get_Data(void)
 static inline void dcu_Debug_Data_Processing(void)
 {
   int_To_String_Unsigned((uint16_t)DCU_Debug_Temperature, &dcu_Debug_Packet[POSITION_DCU_TEMP], 3);
+	int_To_String_Unsigned((uint16_t)DCU_Debug_Temperature, &block_Buffer[buffer_writePointer][DCU_TEMP], 3);
+		
   int_To_String_Unsigned((uint16_t)DCU_Debug_Current, &dcu_Debug_Packet[POSITION_DCU_CURRENT], 4);
+	int_To_String_Unsigned((uint16_t)DCU_Debug_Temperature, &block_Buffer[buffer_writePointer][DCU_CURRENT], 4);
 }
 
 

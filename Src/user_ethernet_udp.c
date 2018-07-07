@@ -5,7 +5,11 @@
 #include "tim.h"
 #include "user_defines.h"
 #include "telemetry_command.h"
+#include "RTC.h"
 
+
+static RTC_DateTypeDef RTC_Date;
+static RTC_TimeTypeDef RTC_Time;
 
 static struct udp_pcb *telemetry_Data_Port;
 static struct udp_pcb *dcu_State_Port;
@@ -51,6 +55,14 @@ extern void UDP_Init(void)
   // Error buffer initialization
   dcu_Error_Buffer[0] = 'E';
   dcu_Error_Buffer[2] = '\0';
+	
+  dcu_Error_Buffer[1] = 0;
+  dcu_Error_Buffer[3] = 0;
+  dcu_Error_Buffer[4] = 0;
+  dcu_Error_Buffer[5] = 0;
+  dcu_Error_Buffer[6] = 0;
+  dcu_Error_Buffer[7] = 0;
+  dcu_Error_Buffer[8] = '\0';
   
   UDP_Deinit();
   telemetry_Data_Port = udp_new();
@@ -247,9 +259,27 @@ extern inline void UDP_Send_Len(uint8_t *msg, struct udp_pcb *pcb, uint16_t len)
 
 
 extern inline void UDP_Send_Error(uint8_t error_Code)
-{
+{	
+  dcu_Error_Buffer[2] = '\0';
   dcu_Error_Buffer[1] = error_Code;
   UDP_Send_Queue(UDP_DCU_ERROR_PORT, dcu_Error_Buffer, BUFFER_ERROR_LEN);
+}
+
+extern inline void UDP_Send_DateTime()
+{
+  dcu_Error_Buffer[8] = '\0';
+	
+	RTC_Get_Value(&RTC_Date, &RTC_Time);
+	
+	dcu_Error_Buffer[1] = 'D';
+	dcu_Error_Buffer[2] = RTC_Date.WeekDay;
+	dcu_Error_Buffer[3] = RTC_Date.Date;
+	dcu_Error_Buffer[4] = RTC_Date.Month;
+	dcu_Error_Buffer[5] = RTC_Date.Year;
+	dcu_Error_Buffer[6] = RTC_Time.Hours;
+	dcu_Error_Buffer[7] = RTC_Time.Minutes;
+  
+	UDP_Send_Queue(UDP_DCU_ERROR_PORT, dcu_Error_Buffer, BUFFER_ERROR_LEN);
 }
 
 

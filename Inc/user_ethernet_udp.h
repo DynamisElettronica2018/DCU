@@ -38,6 +38,7 @@ extern inline void UDP_Deinit(void);
 extern inline void UDP_Send(uint8_t *msg, struct udp_pcb *pcb);
 extern inline void UDP_Send_Len(uint8_t *msg, struct udp_pcb *pcb, uint16_t len);
 extern inline void UDP_Send_Error(uint8_t error_Code);
+extern inline void UDP_Send_DateTime(void);
 extern inline void UDP_Send_Queue(const uint16_t port, uint8_t *data, const uint16_t len);
 extern inline void UDP_Send_Processig(void);
 extern inline void UDP_Receive_Processig(void);

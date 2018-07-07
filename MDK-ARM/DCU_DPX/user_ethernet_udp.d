@@ -85,3 +85,4 @@ dcu_dpx\user_ethernet_udp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/ti
 dcu_dpx\user_ethernet_udp.o: ../Inc/ethernetif.h
 dcu_dpx\user_ethernet_udp.o: ../Inc/tim.h
 dcu_dpx\user_ethernet_udp.o: ../Inc/telemetry_command.h
+dcu_dpx\user_ethernet_udp.o: ../Inc/RTC.h
