@@ -54,9 +54,8 @@ extern void UDP_Init(void)
 
   // Error buffer initialization
   dcu_Error_Buffer[0] = 'E';
-  dcu_Error_Buffer[2] = '\0';
-	
   dcu_Error_Buffer[1] = 0;
+  dcu_Error_Buffer[2] = '\0';
   dcu_Error_Buffer[3] = 0;
   dcu_Error_Buffer[4] = 0;
   dcu_Error_Buffer[5] = 0;
@@ -265,21 +264,21 @@ extern inline void UDP_Send_Error(uint8_t error_Code)
   UDP_Send_Queue(UDP_DCU_ERROR_PORT, dcu_Error_Buffer, BUFFER_ERROR_LEN);
 }
 
-extern inline void UDP_Send_DateTime()
+extern inline void UDP_Send_Date_Time(void)
 {
-  dcu_Error_Buffer[8] = '\0';
-	
-	RTC_Get_Value(&RTC_Date, &RTC_Time);
-	
-	dcu_Error_Buffer[1] = 'D';
+  RTC_Get_Value(&RTC_Date, &RTC_Time);
+  dcu_Error_Buffer[1] = 'D';
 	dcu_Error_Buffer[2] = RTC_Date.WeekDay;
 	dcu_Error_Buffer[3] = RTC_Date.Date;
 	dcu_Error_Buffer[4] = RTC_Date.Month;
 	dcu_Error_Buffer[5] = RTC_Date.Year;
 	dcu_Error_Buffer[6] = RTC_Time.Hours;
 	dcu_Error_Buffer[7] = RTC_Time.Minutes;
-  
+  dcu_Error_Buffer[8] = '\0';
 	UDP_Send_Queue(UDP_DCU_ERROR_PORT, dcu_Error_Buffer, BUFFER_ERROR_LEN);
+  dcu_Error_Buffer[0] = 'E';
+  dcu_Error_Buffer[1] = 0;
+  dcu_Error_Buffer[2] = '\0';
 }
 
 
@@ -474,4 +473,3 @@ static inline struct udp_pcb *get_Udp_Pcb(const uint16_t port)
   
   return NULL;
 }
-

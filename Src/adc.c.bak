@@ -59,9 +59,9 @@
 #include "data.h"
 #include "string_utility.h"
 
-static uint32_t dcu_Debug_Adc_Raw_Data[2];
 uint16_t DCU_Debug_Temperature;
 uint16_t DCU_Debug_Current;
+static uint32_t dcu_Debug_Adc_Raw_Data[2];
 
 /* USER CODE END 0 */
 
@@ -199,22 +199,18 @@ extern inline void dcu_Debug_Get_Data(void)
 }
 
 
-static inline void dcu_Debug_Data_Processing(void)
-{
-  int_To_String_Unsigned((uint16_t)DCU_Debug_Temperature, &dcu_Debug_Packet[POSITION_DCU_TEMP], 3);
-  int_To_String_Unsigned((uint16_t)DCU_Debug_Current, &dcu_Debug_Packet[POSITION_DCU_CURRENT], 4);
-}
-
-
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
   float voltage;
   
-  voltage = (float)(dcu_Debug_Adc_Raw_Data[0]) * LSB_12_BIT_MV * (float)1000;
-  DCU_Debug_Temperature = (uint16_t)((((float)voltage - (float)100) * (float)0.1) - (float)40);
-  voltage = (float)(dcu_Debug_Adc_Raw_Data[1]) * LSB_12_BIT_MV;
-  DCU_Debug_Current = (uint16_t)((voltage / ((float)0.03 * (float)50)) * (float)1000);
-  dcu_Debug_Data_Processing();
+  voltage = (float)(dcu_Debug_Adc_Raw_Data[0]) * LSB_12_BIT_MV;
+  DCU_Debug_Temperature = (uint16_t)((((float)voltage - 100.0f) * 0.1f) - 40.0f);
+  voltage = (float)(dcu_Debug_Adc_Raw_Data[1]) * LSB_12_BIT_V;
+  DCU_Debug_Current = (uint16_t)((voltage / (0.03f * 50.0f)) * 1000.0f);
+  int_To_String_Unsigned((uint16_t)DCU_Debug_Temperature, &dcu_Debug_Packet[POSITION_DCU_TEMP], 3);
+  int_To_String_Unsigned((uint16_t)DCU_Debug_Temperature, &block_Buffer[buffer_Write_Pointer][DCU_TEMP], 3);
+  int_To_String_Unsigned((uint16_t)DCU_Debug_Current, &dcu_Debug_Packet[POSITION_DCU_CURRENT], 4);
+  int_To_String_Unsigned((uint16_t)DCU_Debug_Temperature, &block_Buffer[buffer_Write_Pointer][DCU_CURRENT], 4);
 }
 
 

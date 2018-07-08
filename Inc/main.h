@@ -123,14 +123,13 @@
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 
   *        HAL drivers code
   */
-/* #define USE_FULL_ASSERT    1U */
+#define USE_FULL_ASSERT    1U
 
 /* USER CODE BEGIN Private defines */
 
 extern inline void TIM5_IRQ_User_Handler(void);
 extern inline void TIM6_IRQ_User_Handler(void);
 extern inline void TIM7_IRQ_User_Handler(void);
-void set_DCU_AUX_Msg(uint16_t ID);
 
 /* USER CODE END Private defines */
 

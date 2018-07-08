@@ -131,7 +131,7 @@ static inline void dcu_Board_Command(char *command)
       break;
 		
 		case GET_RTC_TIME_DATA:
-			UDP_Send_DateTime();
+			UDP_Send_Date_Time();
       break;
   }
   

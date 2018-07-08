@@ -65,7 +65,8 @@ extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN Private defines */
 
-#define LSB_12_BIT_MV (0.0008056640625f)
+#define LSB_12_BIT_V (0.000805860805860f)
+#define LSB_12_BIT_MV (0.805860805860f)
    
 extern uint16_t DCU_Debug_Temperature;
 extern uint16_t DCU_Debug_Current;
@@ -79,7 +80,6 @@ void MX_ADC1_Init(void);
 /* USER CODE BEGIN Prototypes */
 
 extern inline void dcu_Debug_Get_Data(void);
-static inline void dcu_Debug_Data_Processing(void);
 
 /* USER CODE END Prototypes */
 

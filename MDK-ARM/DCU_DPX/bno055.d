@@ -40,5 +40,4 @@ dcu_dpx\bno055.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 dcu_dpx\bno055.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 dcu_dpx\bno055.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_hcd.h
 dcu_dpx\bno055.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_ll_usb.h
-dcu_dpx\bno055.o: ../Inc/data.h
-dcu_dpx\bno055.o: ../Inc/user_defines.h
+dcu_dpx\bno055.o: ../Inc/rtc.h

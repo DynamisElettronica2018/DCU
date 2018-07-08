@@ -132,6 +132,6 @@
 "dcu_dpx\usbh_msc_bot.o"
 "dcu_dpx\usbh_msc_scsi.o"
 --library_type=microlib --strict --scatter "DCU_DPX\DCU_DPX.sct"
---summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "DCU_DPX.map" -o DCU_DPX\DCU_DPX.axf

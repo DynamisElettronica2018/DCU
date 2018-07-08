@@ -59,16 +59,12 @@
 #include "adc.h"
 #include "data.h"
 
-//volatile uint32_t packet_Fifo0_Counter = 0;
-//volatile uint32_t packet_Fifo1_Counter = 0;
 static CAN_FilterTypeDef CAN_Filter_Config;
 static CAN_RxHeaderTypeDef CAN_Received_0_Message_Header;
 static CAN_RxHeaderTypeDef CAN_Received_1_Message_Header;
 static CAN_TxHeaderTypeDef dcu_Debug_Packet_Header;
-//static CAN_TxHeaderTypeDef dcu_Aux_Packet_Header;
 static uint8_t CAN_Received_0_Message_Data[8];
 static uint8_t CAN_Received_1_Message_Data[8];
-//static uint8_t dcu_Aux_Packet_Data[2];
 static uint8_t dcu_Debug_Packet_Data[6];
 
 /* USER CODE END 0 */
@@ -172,15 +168,6 @@ extern void CAN1_Start(void)
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO1_MSG_PENDING);
   
-  /*dcu_Aux_Packet_Header.StdId = DCU_AUX_ID;
-  dcu_Aux_Packet_Header.StdId = DCU_DEBUG_ID;
-  dcu_Aux_Packet_Header.RTR = CAN_RTR_DATA;
-  dcu_Aux_Packet_Header.IDE = CAN_ID_STD;
-  dcu_Aux_Packet_Header.DLC = 2;
-  dcu_Aux_Packet_Header.TransmitGlobalTime = DISABLE;	
-  dcu_Aux_Packet_Data[0] = 0;
-  dcu_Aux_Packet_Data[1] = 1;*/
-  
   dcu_Debug_Packet_Header.StdId = DCU_DEBUG_ID;
   dcu_Debug_Packet_Header.RTR = CAN_RTR_DATA;
   dcu_Debug_Packet_Header.IDE = CAN_ID_STD;
@@ -194,19 +181,14 @@ extern void CAN1_Start(void)
   dcu_Debug_Packet_Data[5] = 0;
 }
 
-extern inline void CAN_Send_Dcu_Is_Alive_Packet(void)
+
+extern inline void CAN_Set_Dcu_Is_Alive_Packet(void)
 {
-  //uint32_t dcu_Aux_Packet_Mailbox;
-	
-  //HAL_CAN_AddTxMessage(&hcan1, &dcu_Aux_Packet_Header, dcu_Aux_Packet_Data, &dcu_Aux_Packet_Mailbox);
   dcu_Debug_Packet_Data[5] = 1;
 }
 
-extern inline void CAN_Send_Dcu_IsNot_Alive_Packet(void)
+extern inline void CAN_Set_Dcu_Is_Not_Alive_Packet(void)
 {
-  ////uint32_t dcu_Aux_Packet_Mailbox;
-	
-  //HAL_CAN_AddTxMessage(&hcan1, &dcu_Aux_Packet_Header, dcu_Aux_Packet_Data, &dcu_Aux_Packet_Mailbox);
   dcu_Debug_Packet_Data[5] = 0;
 }
 
@@ -218,7 +200,6 @@ extern inline void CAN_Send_Dcu_Debug_Pakcet(void)
   dcu_Debug_Packet_Data[1] = (uint8_t)(DCU_Debug_Temperature & 0x00FF);
   dcu_Debug_Packet_Data[2] = (uint8_t)((DCU_Debug_Current >> 8) & 0x00FF);
   dcu_Debug_Packet_Data[3] = (uint8_t)(DCU_Debug_Current & 0x00FF);
-	
   HAL_CAN_AddTxMessage(&hcan1, &dcu_Debug_Packet_Header, dcu_Debug_Packet_Data, &dcu_Debug_Packet_Mailbox);
 }
 
@@ -279,7 +260,7 @@ static void CAN1_Filter_Setup(void)
   CAN_Filter_Config.SlaveStartFilterBank = 14;
 	HAL_CAN_ConfigFilter(&hcan1, &CAN_Filter_Config);	
 	
-//*****FIFO 1 *****//
+  //*****FIFO 1 *****//
 
 	/*START ACQ
 	ID = 0x7F0
@@ -344,14 +325,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
   HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &CAN_Received_0_Message_Header, CAN_Received_0_Message_Data); 
   data_Conversion(CAN_Received_0_Message_Header.StdId, CAN_Received_0_Message_Data);
-  //packet_Fifo0_Counter++;
 }
 
 
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
   HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO1, &CAN_Received_1_Message_Header, CAN_Received_1_Message_Data);
-  //packet_Fifo1_Counter++;
 	
 	if(CAN_Received_1_Message_Header.FilterMatchIndex == 0)
 	{
@@ -375,7 +354,6 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
 void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 {
-  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
 }
 
 

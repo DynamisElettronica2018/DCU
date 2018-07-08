@@ -15,7 +15,7 @@
 #define START_ACQUISITION_REQUEST   ((uint8_t)1)
 #define STOP_ACQUISITION_REQUEST    ((uint8_t)2)
 #define START_ACQUISITION_DONE      ((uint8_t)0)
-#define CLOSE_FILE_INTERVAL		      ((uint32_t)300000) //5 minutes
+#define CLOSE_FILE_INTERVAL		      ((uint32_t)300000)	//5 minutes.
 
 
 #endif	/* USER_DEFINES_H */

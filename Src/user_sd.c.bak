@@ -1,5 +1,5 @@
 #include "user_sd.h"
-//#include "sdmmc.h"
+#include "sdmmc.h"
 #include "fatfs.h"
 #include "data.h"
 #include "tim.h"
@@ -8,12 +8,12 @@
 #include "user_ethernet_udp.h"
 
 
-//static RTC_DateTypeDef RTC_Date;
-//static RTC_TimeTypeDef RTC_Time;
-//static char SD_Filename[13];
+/*static RTC_DateTypeDef RTC_Date;
+static RTC_TimeTypeDef RTC_Time;
+static char SD_Filename[13];
 
 
-/*extern void SD_Init(void)
+extern void SD_Init(void)
 {	
   if(f_mount(&SDFatFS, SDPath, 1) != FR_OK)
   {
@@ -80,23 +80,44 @@ extern inline void SD_Open_File(void)
   {
     HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
     UDP_Send_Error(OPEN_FILE_OK);
+    SD_Write_Len(header_Packet_Buffer);
+    dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] = UDP_DCU_STATE_OK;
+    USB_Timestamp = 0;
   }
 }
 
 
-extern inline void SD_Write_Len(uint8_t *write_Buffer)
+extern inline void SD_Close_File(void)
 {
-  uint32_t written_Bytes;
-  uint32_t bytes;
-  FRESULT SD_Status;
+  if(f_close(&SDFile) != FR_OK)
+  {
+    UDP_Send_Error(CLOSE_FILE_ERROR);
+  }
   
-  bytes = strlen((char *)write_Buffer);
-	SD_Status = f_write(&SDFile, write_Buffer, bytes, (void*)&written_Bytes);
-		
-	if(SD_Status != FR_OK)
-	{
-		UDP_Send_Error(WRITE_FILE_ERROR);
-	}
+  else
+  {
+    dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] = UDP_DCU_STATE_ERROR;
+    UDP_Send_Error(CLOSE_FILE_OK);
+    HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+  }
+}
+
+
+extern inline void SD_Close_And_Open_File(void)
+{
+  if(f_close(&SDFile) != FR_OK)
+  { 
+    dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] = UDP_DCU_STATE_ERROR;
+    UDP_Send_Error(CLOSE_FILE_ERROR);
+    HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+  }
+
+  if(f_open(&SDFile, SD_Filename, FA_OPEN_APPEND | FA_WRITE) != FR_OK)
+  {
+    UDP_Send_Error(OPEN_FILE_ERROR);
+    dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] = UDP_DCU_STATE_ERROR;
+    HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+  }
 }
 
 
@@ -114,22 +135,23 @@ extern inline void SD_write_Block(uint8_t *write_Buffer)
 }
 
 
-extern inline void SD_Close_File(void)
+extern inline void SD_Write_Len(uint8_t *write_Buffer)
 {
-  if(f_close(&SDFile) != FR_OK)
-	{
-		UDP_Send_Error(CLOSE_FILE_ERROR);
-	}
+  uint32_t written_Bytes;
+  uint32_t bytes;
+  FRESULT SD_Status;
   
-  else
+  bytes = strlen((char *)write_Buffer);
+  SD_Status = f_write(&SDFile, write_Buffer, bytes, (void*)&written_Bytes);
+    
+  if(SD_Status != FR_OK)
   {
-    HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
-    UDP_Send_Error(CLOSE_FILE_OK);
+    UDP_Send_Error(WRITE_FILE_ERROR);
   }
 }
 
 
-extern inline void SD_Get_File_Name(char *filename)
+static inline void SD_Get_File_Name(char *filename)
 {
   RTC_Get_Value(&RTC_Date, &RTC_Time);
   sprintf(filename, "%2d_%2d_%2d.csv", RTC_Time.Hours, RTC_Time.Minutes, RTC_Time.Seconds);

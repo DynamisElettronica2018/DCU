@@ -97,7 +97,7 @@ extern inline void int_To_String(int16_t i, uint8_t *s, uint8_t size)
 
 	// Se il numero è negatico, lo trasformo in uno positivo mettendo il meno davanti
 	if(i < 0)
-  {
+	{
 		s[0] = '-';
 		i = i * (-1);
 		char_Size_Count = 1;
@@ -114,8 +114,7 @@ extern inline void int_To_String(int16_t i, uint8_t *s, uint8_t size)
 		char_Size_Count++;
 	}
 
-	div_Result = i
-  ;
+	div_Result = i;
 
 	// Controllo se il nuemro da convertire richiede più spazio di quello voluto (parametro size)
 	// Se lo richiede scrivo sempre '*', alrimenti lo converto nella stringa

@@ -14,7 +14,7 @@
 #define DEST_IP_ADDR1                 ((uint8_t)255)
 #define DEST_IP_ADDR2                 ((uint8_t)255)
 #define DEST_IP_ADDR3                 ((uint8_t)255)
-#define UDP_SEND_BUFFER_LEN           ((uint16_t)1024)
+#define UDP_SEND_BUFFER_LEN           ((uint16_t)2048)
 #define UDP_RECEIVE_BUFFER_LEN        ((uint16_t)128)
 
 
@@ -34,11 +34,11 @@ typedef struct
 
 
 extern void UDP_Init(void);
-extern inline void UDP_Deinit(void);
+extern void UDP_Deinit(void);
 extern inline void UDP_Send(uint8_t *msg, struct udp_pcb *pcb);
 extern inline void UDP_Send_Len(uint8_t *msg, struct udp_pcb *pcb, uint16_t len);
 extern inline void UDP_Send_Error(uint8_t error_Code);
-extern inline void UDP_Send_DateTime(void);
+extern inline void UDP_Send_Date_Time(void);
 extern inline void UDP_Send_Queue(const uint16_t port, uint8_t *data, const uint16_t len);
 extern inline void UDP_Send_Processig(void);
 extern inline void UDP_Receive_Processig(void);

@@ -61,6 +61,9 @@
 
 /* USER CODE BEGIN Includes */
 
+// Default value of ETH_RXBUFNB is 4U: it must be icrease to 16U. But the CubeMX can't change this value with any graphical tool. 
+// It must change it manually for every compile.
+
 #include "user_defines.h"
 #include "telemetry_command.h"
 #include "system.h"
@@ -79,9 +82,6 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
-//volatile static uint32_t packet_Fifo0_Counted = 0;
-//volatile static uint32_t packet_Fifo1_Counted = 0;
 
 /* USER CODE END PV */
 
@@ -148,9 +148,10 @@ int main(void)
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
   MX_DriverVbusHS(USB_VBUS_ENABLE);
   CAN1_Start();
-  UDP_Init();
+  //CAN3_Start();
+  //set_Rtc_Time((uint8_t)18, (uint8_t)45, (uint8_t)0);
   //SD_Check_And_Init();
-	//set_Rtc_Time((uint8_t)18, (uint8_t)45, (uint8_t)0);
+  UDP_Init();
   initialize_Data();
   BNO055_Init();
   dcu_Debug_Get_Data();
@@ -167,6 +168,7 @@ int main(void)
     if(start_Acquisition_Request == START_ACQUISITION_REQUEST)
     {
       start_Acquisition_Request = START_ACQUISITION_DONE;
+
 			if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_ERROR)
 			{
 				USB_Open_File();
@@ -174,7 +176,7 @@ int main(void)
 				if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_OK)
 				{
 						HAL_TIM_Base_Start_IT(&htim7);
-						CAN_Send_Dcu_Is_Alive_Packet();
+            CAN_Set_Dcu_Is_Alive_Packet();
 				}
 			}
     }
@@ -185,9 +187,13 @@ int main(void)
 			
 			if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_OK)
 			{
-				USB_Close_File();   
-				HAL_TIM_Base_Stop_IT(&htim7);
-				CAN_Send_Dcu_IsNot_Alive_Packet();
+        HAL_TIM_Base_Stop_IT(&htim7);
+				USB_Close_File();
+
+        if(dcu_State_Packet[DCU_STATE_PACKET_ACQUISITION_ON] == UDP_DCU_STATE_ERROR)
+        {
+            CAN_Set_Dcu_Is_Not_Alive_Packet();
+        }
 			}
     }
     
@@ -289,7 +295,7 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-//1Hz
+//1 Hz
 extern inline void TIM6_IRQ_User_Handler(void)
 {
   dcu_Debug_Get_Data();
@@ -303,7 +309,7 @@ extern inline void TIM6_IRQ_User_Handler(void)
 }
 
 
-//10Hz
+//10 Hz
 extern inline void TIM5_IRQ_User_Handler(void)
 {
   HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
@@ -316,36 +322,28 @@ extern inline void TIM5_IRQ_User_Handler(void)
 			Imu_Dcu_Conversion_To_Buffer();
 		}
 		
-		//makeDataAvg();
-		
-		buffer_telemetryPointer = (buffer_telemetryPointer + BUFFER_LEN - 1) % BUFFER_LEN;
-		
-		UDP_Send_Queue(UDP_TELEMETRY_DATA_PORT, block_Buffer[buffer_telemetryPointer], BUFFER_BLOCK_LEN);
+		//make_Data_Average();
+		buffer_Telemetry_Pointer = (buffer_Telemetry_Pointer + BUFFER_LEN - 1) % BUFFER_LEN;
+		UDP_Send_Queue(UDP_TELEMETRY_DATA_PORT, block_Buffer[buffer_Telemetry_Pointer], BUFFER_BLOCK_LEN);
 	}
 }
 
 
-//100Hz
+//100 Hz
 extern inline void TIM7_IRQ_User_Handler(void)
 {
-  uint32_To_String(USB_Timestamp, block_Buffer[buffer_writePointer], 7);
+  uint32_To_String(USB_Timestamp, block_Buffer[buffer_Write_Pointer], 7);
   USB_Timestamp += 10;
-  
 	BNO055_Imu_Read_Data();
 	Imu_Dcu_Conversion_To_Buffer();
+	buffer_Write_Pointer = (buffer_Write_Pointer + 1) % BUFFER_LEN;
+  USB_Write_Block(block_Buffer[buffer_Read_Pointer]);
+	prepare_Next_Buffer_Block(buffer_Read_Pointer, buffer_Write_Pointer);
+	buffer_Read_Pointer = (buffer_Read_Pointer + 1) % BUFFER_LEN;
 	
-	buffer_writePointer = (buffer_writePointer + 1) % BUFFER_LEN;
-	
-  USB_Write_Block(block_Buffer[buffer_readPointer]);
-	
-	//Copy the last saved block to the next one, to garantee the sequence of the data with low sample rate
-	prepareNextBufferBlock(buffer_readPointer, buffer_writePointer);
-	
-	buffer_readPointer = (buffer_readPointer + 1) % BUFFER_LEN;
-	
-	if(USB_Timestamp % CLOSE_FILE_INTERVAL == 0)
+	if((USB_Timestamp % CLOSE_FILE_INTERVAL) == 0)
 	{
-		USB_CloseOpen_File();
+		USB_Close_And_Open_File();
 	}
 }
 
@@ -374,9 +372,16 @@ void _Error_Handler(char *file, int line)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+  
+  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+  
   while(1)
   {
+    HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+    HAL_Delay(40);
   }
+
   /* USER CODE END Error_Handler_Debug */
 }
 

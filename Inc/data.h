@@ -14,6 +14,13 @@
 #define LOAD_CELL_RR_OFFSET     (0.0f)
 
 
+/***************DAU VOLTAGE REFERENCES*********************/
+
+#define DAU_FL_SAMPLE_TO_VOLT   (5.052f / 4095.0f)
+#define DAU_FR_SAMPLE_TO_VOLT   (5.116f / 4095.0f)
+#define DAU_REAR_SAMPLE_TO_VOLT (5.118f / 4095.0f)
+
+
 /********************CSV SYMBOLS***************************/
 
 #define SEPARATOR               ((uint8_t)';')
@@ -167,9 +174,9 @@
 #define DAU_REAR_TEMP        		((uint16_t)491)
 #define DAU_REAR_CURRENT     		((uint16_t)495)
 #define SW_TEMP              		((uint16_t)500)
-//#define EBB_TEMP             		((uint16_t)40)
-//#define EBB_BOARD_CURRENT    		((uint16_t)44)
-//#define EBB_MOTOR_CURRENT    		((uint16_t)49)
+//#define EBB_TEMP             	
+//#define EBB_BOARD_CURRENT    	
+//#define EBB_MOTOR_CURRENT    
 
 /************************** DEBUG *************************/
 
@@ -220,43 +227,43 @@
 #define SEP_DRS_CURRENT         (POSITION_DRS_CURRENT - 1)
 #define DEBUG_PACKET_END_LINE   (POSITION_DRS_CURRENT + 5)
 
-#define AVGBUF_WHEELSPEED1			0
-#define AVGBUF_WHEELSPEED2			1
-#define AVGBUF_WHEELSPEED3			2
-#define AVGBUF_WHEELSPEED4			3
-#define AVGBUF_BRAKEPRESSF			4
-#define AVGBUF_BRAKEPRESSR			5
-#define AVGBUF_TPS							6
-#define AVGBUF_SW								7
-#define AVGBUF_ACCX							8
-#define AVGBUF_ACCY							9
-#define AVGBUF_ACCZ							10
-#define AVGBUF_GYROZ						11
-#define AVGBUF_DCU_ACCX					12
-#define AVGBUF_DCU_ACCY					13
-#define AVGBUF_DCU_ACCZ					14
-#define AVGBUF_DCU_GYROZ				15
-#define AVGBUF_VHSPEED					16
-#define AVGBUF_LINEARFL					17
-#define AVGBUF_LINEARFR					18
-#define AVGBUF_LINEARRR					19
-#define AVGBUF_LINEARRL					20
+#define AVGBUF_WHEELSPEED1			((uint8_t)0)
+#define AVGBUF_WHEELSPEED2			((uint8_t)1)
+#define AVGBUF_WHEELSPEED3			((uint8_t)2)
+#define AVGBUF_WHEELSPEED4			((uint8_t)3)
+#define AVGBUF_BRAKEPRESSF			((uint8_t)4)
+#define AVGBUF_BRAKEPRESSR			((uint8_t)5)
+#define AVGBUF_TPS							((uint8_t)6)
+#define AVGBUF_SW								((uint8_t)7)
+#define AVGBUF_ACCX							((uint8_t)8)
+#define AVGBUF_ACCY							((uint8_t)9)
+#define AVGBUF_ACCZ							((uint8_t)10)
+#define AVGBUF_GYROZ						((uint8_t)11)
+#define AVGBUF_DCU_ACCX					((uint8_t)12)
+#define AVGBUF_DCU_ACCY					((uint8_t)13)
+#define AVGBUF_DCU_ACCZ					((uint8_t)14)
+#define AVGBUF_DCU_GYROZ				((uint8_t)15)
+#define AVGBUF_VHSPEED					((uint8_t)16)
+#define AVGBUF_LINEARFL					((uint8_t)17)
+#define AVGBUF_LINEARFR					((uint8_t)18)
+#define AVGBUF_LINEARRR					((uint8_t)19)
+#define AVGBUF_LINEARRL					((uint8_t)20)
 
 
 extern uint8_t dcu_State_Packet[BUFFER_STATE_LEN];
 extern uint8_t dcu_Debug_Packet[BUFFER_DEBUG_LEN];
 extern uint8_t block_Buffer[BUFFER_LEN][BUFFER_BLOCK_LEN];
-extern volatile uint8_t buffer_writePointer;
-extern volatile uint8_t buffer_readPointer;
-extern volatile uint8_t buffer_telemetryPointer;
-
+extern uint8_t header_Packet_Buffer[];
+extern volatile uint8_t buffer_Write_Pointer;
+extern volatile uint8_t buffer_Read_Pointer;
+extern volatile uint8_t buffer_Telemetry_Pointer;
 extern volatile uint32_t USB_Timestamp;
 extern volatile uint8_t start_Acquisition_Request;
 
 
 extern void initialize_Data(void);
-extern inline void prepareNextBufferBlock(uint8_t previousPointer, uint8_t nextPointer);
-extern inline void makeDataAvg(void);
+extern inline void prepare_Next_Buffer_Block(uint8_t previous_Pointer, uint8_t next_Pointer);
+extern inline void make_Data_Average(void);
 extern inline void data_Conversion(uint16_t ID, uint8_t payload[8]);
 extern inline void Imu_Dcu_Conversion_To_Buffer(void);
 extern inline void debug_Data_Conversion(uint16_t ID, uint8_t payload[8]);

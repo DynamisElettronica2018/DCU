@@ -75,8 +75,8 @@ void MX_RTC_Init(void);
 
 extern inline void RTC_Get_Value(RTC_DateTypeDef *date, RTC_TimeTypeDef *time);
 extern inline void RTC_Get_Value_With_Subseconds(RTC_DateTypeDef *date, RTC_TimeTypeDef *time, uint32_t *subseconds);
-extern void set_Rtc_Time(uint8_t hours, uint8_t minutes, uint8_t seconds);
-extern void set_Rtc_Date(uint8_t weekday, uint8_t month, uint8_t date, uint8_t year);
+extern inline void set_Rtc_Time(uint8_t hours, uint8_t minutes, uint8_t seconds);
+extern inline void set_Rtc_Date(uint8_t weekday, uint8_t month, uint8_t date, uint8_t year);
 
 /* USER CODE END Prototypes */
 
